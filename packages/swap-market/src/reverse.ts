@@ -27,6 +27,7 @@ export async function createReverseSwap(p: {
   destination: string;
   relays?: string[];
   esplora?: Esplora;
+  timeoutMs?: number;
 }): Promise<ReverseSwap> {
   const { offer } = p;
   const preimage = randomBytes(32);
@@ -39,6 +40,7 @@ export async function createReverseSwap(p: {
     server: offer.pubkey,
     relays,
     secretKey: generateSecretKey(),
+    timeoutMs: p.timeoutMs,
     method: 'createswap',
     data: {
       type: 'reversesubmarine',

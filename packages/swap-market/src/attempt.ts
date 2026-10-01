@@ -66,12 +66,14 @@ export async function startAttempt(p: {
   destination: string;
   requestId?: string;
   relays?: string[];
+  /** How long to wait for the provider's reply. */
+  timeoutMs?: number;
 }, deps: AttemptDeps): Promise<SwapAttempt> {
   if (p.quote.expiresAt < Date.now() / 1000) throw new Error('quote expired, requote');
   if (p.offer.pubkey !== p.quote.provider) throw new Error('quote is for another provider');
   const esplora = deps.esplora ?? new Esplora(ESPLORA[p.quote.network]);
   const swap = await (deps.createSwap ?? createReverseSwap)({
-    offer: p.offer, network: p.quote.network, lightningSat: p.quote.payerSat, destination: p.destination, relays: p.relays, esplora,
+    offer: p.offer, network: p.quote.network, lightningSat: p.quote.payerSat, destination: p.destination, relays: p.relays, esplora, timeoutMs: p.timeoutMs,
   });
   await deps.secrets.put(secretKey(swap.id), JSON.stringify({ preimage: swap.preimage, claimPrivkey: swap.claimPrivkey }));
   const { preimage, claimPrivkey, ...pub } = swap;
