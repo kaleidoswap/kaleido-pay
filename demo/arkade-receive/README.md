@@ -18,7 +18,7 @@ On hosts requiring an HTTP proxy, use `NODE_USE_ENV_PROXY=1` on a Node version
 supporting that setting. Never disable TLS verification. The Nostr transport
 also needs relay connectivity.
 
-Only Mutinynet is supported. The script pins the third-party solver public key
+Funded execution supports only Mutinynet. A separate mainnet preparation-only probe is available below. The script pins the third-party solver public key
 and relay, checks the registry and Ark server network, and asks the SDK to verify
 the invoice/hash, derive the contract and persist recovery before printing the
 invoice. It never pays Lightning invoices. `--resume` may claim an incoming
@@ -83,3 +83,22 @@ The receiver remained pending and the watcher was stopped. The attempt and
 wallet recovery data were preserved. Next prerequisite: a Mutinynet Lightning
 payer with a route to this solver, or repair the test node's routing connectivity.
 Do not retry merely by increasing the fee cap or assume Bark signet is compatible.
+
+## Mainnet availability probe (2026-10-01)
+
+```sh
+npm run receive -- --mainnet-probe --prepare --amount 500 --max-pay 1000
+```
+
+This contacts the legacy pinned Ark Labs solver over the same Nostr relay,
+using `https://arkade.computer` and an isolated identity/recovery directory
+`demo/.attempts/arkade-mainnet-probe`. It cannot resume/claim mainnet swaps and
+does not print the invoice. Never pay an invoice produced by this probe: funded
+mainnet recovery and an explicitly approved payment are separate prerequisites.
+
+Despite the empty public bitcoin registry, the pinned mainnet solver replied
+to an actual receive request: **504 sats Lightning for 500 sats Arkade**. The
+SDK verified the invoice and persisted the preparation. The 4-sat difference
+excludes payer routing fees. This proves current receive-quote availability,
+not successful settlement or Bark connectivity. No mainnet funds were spent.
+Quotes expire; do not treat these amounts as a permanent fee schedule.

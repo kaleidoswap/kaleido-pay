@@ -1,6 +1,6 @@
 import { decode } from 'light-bolt11-decoder';
-export function invoiceFacts(invoice: string) {
-  if (!invoice.startsWith('lntbs')) throw new Error('Expected a signet invoice; chain identity still requires provider verification');
+export function invoiceFacts(invoice: string, network: 'bitcoin' | 'mutinynet' = 'mutinynet') {
+  if (!(network === 'bitcoin' ? /^lnbc[0-9]/ : /^lntbs[0-9]/).test(invoice)) throw new Error('Unexpected invoice network; chain identity still requires provider verification');
   const d=decode(invoice);
   const field=(name:string)=>(d.sections as any[]).find(s=>s.name===name)?.value;
   const msat=Number(field('amount')), stamp=Number(field('timestamp')), expiry=Number(field('expiry')??3600);
