@@ -1,0 +1,17 @@
+# Mutinynet ldk-server that issues universal offers (BOLT12 + ssps_rails).
+# Mutinynet is a custom signet with the same genesis, so LDK runs it as "signet".
+[node]
+network = "signet"
+listening_addresses = ["0.0.0.0:9738"]
+grpc_service_address = "127.0.0.1:3638"
+alias = "kaleidopay-mutinynet"
+
+[storage.disk]
+dir_path = "./data-mutinynet"
+
+[log]
+level = "Info"
+log_to_file = true
+
+[esplora]
+server_url = "https://mutinynet.com/api"
