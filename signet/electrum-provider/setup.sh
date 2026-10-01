@@ -7,6 +7,8 @@ PY=${PYTHON:-/opt/homebrew/bin/python3.14}
 [ -d src ] || git clone -q --depth 1 --branch 4.8.2 https://github.com/spesmilo/electrum.git src
 [ -d .venv ] || "$PY" -m venv .venv
 .venv/bin/pip install -q -e "src[crypto]"   # needs autoconf automake libtool for libsecp256k1
+# Signet only: Electrum refuses channels under 200k sats; our test coins are scarce.
+sed -i '' "s/^MIN_FUNDING_SAT = .*/MIN_FUNDING_SAT = ${MIN_FUNDING_SAT:-100_000}/" src/electrum/lnutil.py
 E() { .venv/bin/electrum --signet -D data "$@"; }
 if [ ! -f data/signet/wallets/default_wallet ]; then
   mkdir -p data && umask 077
