@@ -26,3 +26,11 @@ wallet; it does not validate Bark. The existing Arkade balance remains untouched
 
 Official fee schedule (dynamic): https://second.tech/pricing
 Installed SDK repository: https://gitlab.com/ark-bitcoin/bark-ffi-bindings
+
+Upstream native bindings also inspected at commit `157b0fc` of
+`ark-bitcoin/bark-ffi-bindings`: React Native uses positional
+`payLightningInvoice(invoice, amountSats?: bigint, wait?: boolean)` and
+`estimateLightningSendFee(amountSats: bigint)`, unlike the WASM object's
+number-valued arguments. It also exposes no send fee-cap argument. Mo's native
+bridge must translate bigint values with safe-integer checks and normalize
+status variants; passing the WASM options object directly is incompatible.
