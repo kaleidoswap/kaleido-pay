@@ -102,3 +102,36 @@ SDK verified the invoice and persisted the preparation. The 4-sat difference
 excludes payer routing fees. This proves current receive-quote availability,
 not successful settlement or Bark connectivity. No mainnet funds were spent.
 Quotes expire; do not treat these amounts as a permanent fee schedule.
+
+## Bark integration handoff
+
+`npm run receive -- --mainnet-probe --inspect` loads the existing identity and
+records, checks invoice network/hash/amount/expiry and reads the Arkade balance.
+It never claims or pays. An unknown wallet fee remains `null`, not zero.
+`reviewReceive` returns `paymentAuthorized: false` even with a known fee cap;
+application approval and enforcing that cap are separate wallet responsibilities.
+
+The inspected wallet-engine Bark adapter awaits `payLightningInvoice` with
+`wait: true`. Run receiver reconciliation concurrently: waiting for Lightning
+completion before starting the receive claim can deadlock a hold invoice.
+The adapter currently returns `fee: 0` without measured fee evidence; the host
+must obtain the actual fee policy/cap instead of presenting that as free routing.
+Do not modify Mo's adapter in this harness.
+
+Mainnet receive recovery is an explicit, separate action:
+
+```sh
+npm run receive -- --mainnet-recovery --resume --watch
+```
+
+This may claim already-funded incoming swaps and reveal their preimages. It
+uses the isolated mainnet probe wallet; it never initiates a Lightning payment.
+Implementation is present but funded mainnet recovery has NOT been verified.
+The preparation-only probe still refuses resume/watch. The previous warning
+against paying probe invoices applies until the payer, fee approval and running
+receiver have been established. Do not use an expired invoice.
+
+Read-only mainnet inspection after preparation found the invoice expired and
+all wallet balances zero. Next dependency: identify the Bark mainnet wallet,
+verify its fee enforcement and status recovery, then prepare a fresh approved
+request. The host must keep mainnet and test-network identities separate.

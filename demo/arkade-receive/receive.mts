@@ -6,17 +6,21 @@ import { resolve } from 'node:path';
 import { Wallet, SingleKey } from '@arkade-os/sdk';
 import { ArkadeIntentsVenue } from '@kaleidorg/swap-sdk/arkade';
 import { nostrRfqTransport } from '@arkade-os/swap/nostr';
+import { reviewReceive } from './review.mts';
 import { invoiceFacts } from './invoice.mts';
 
 const { values: opts } = parseArgs({ options: {
-  'mainnet-probe': { type: 'boolean' }, prepare: { type: 'boolean' }, resume: { type: 'boolean' }, watch: { type: 'boolean' },
+  'mainnet-recovery': { type: 'boolean' }, inspect: { type: 'boolean' }, 'mainnet-probe': { type: 'boolean' }, prepare: { type: 'boolean' }, resume: { type: 'boolean' }, watch: { type: 'boolean' },
   amount: { type: 'string', default: '2000' },
   'max-pay': { type: 'string', default: '2200' },
 } });
+if (opts.inspect && (opts.prepare || opts.resume || opts.watch)) throw new Error('--inspect is read-only and exclusive');
 if (opts.watch && !opts.resume) throw new Error('--watch requires --resume');
 if (opts.prepare && opts.resume) throw new Error('Choose prepare or resume');
-const mainnetProbe = !!opts['mainnet-probe'];
-if (mainnetProbe && (opts.resume || opts.watch)) throw new Error('Mainnet probe cannot claim or reconcile');
+const mainnetRecovery = !!opts['mainnet-recovery'];
+if (mainnetRecovery && (opts['mainnet-probe'] || !opts.resume)) throw new Error('--mainnet-recovery requires --resume and excludes --mainnet-probe');
+const mainnetProbe = !!opts['mainnet-probe'] || mainnetRecovery;
+if (mainnetProbe && !mainnetRecovery && (opts.resume || opts.watch)) throw new Error('Mainnet probe cannot claim or reconcile');
 const amount = Number(opts.amount), maxPay = Number(opts['max-pay']);
 if (![amount,maxPay].every(n => Number.isSafeInteger(n) && n > 0) || maxPay < amount) throw new Error('Invalid amounts');
 const network = mainnetProbe ? 'bitcoin' : 'mutinynet';
@@ -34,7 +38,7 @@ const market = registry.markets.find((m: any) => m.discovery_pubkey === pinned &
 if (!market && !mainnetProbe) throw new Error('Pinned Mutinynet Lightning market unavailable');
 if (market && (amount < Number(market.min_base_amount) || amount > Number(market.max_base_amount))) throw new Error('Amount outside advertised limits');
 console.log(JSON.stringify({network:info.network,solver:market?.solver ?? 'legacy configured mainnet solver (unlisted)',solverPubkey:pinned,registryGeneratedAt:registry.generated_at,feeBps:market?.fee_bps,readiness:market ? 'advertised, not settlement verified' : 'unlisted; probing availability only'},null,2));
-if (!opts.prepare && !opts.resume) process.exit(0);
+if (!opts.prepare && !opts.resume && !opts.inspect) process.exit(0);
 
 // Keep state outside the source folder; only one process may use this wallet.
 process.umask(0o077);
@@ -51,7 +55,7 @@ try {
   let identity: SingleKey;
   try { identity = SingleKey.fromHex(JSON.parse(await readFile(resolve(dir,'identity.json'),'utf8')).privateKey); }
   catch(e: any) {
-    if (e.code !== 'ENOENT' || opts.resume) throw e;
+    if (e.code !== 'ENOENT' || opts.resume || opts.inspect) throw e;
     identity = SingleKey.fromRandomBytes();
     await save('identity.json',{privateKey:identity.toHex()});
   }
@@ -73,7 +77,10 @@ try {
   wallet = await Wallet.create({storage:{walletRepository:new SQLiteWalletRepository(sql),contractRepository:new SQLiteContractRepository(sql)},identity,arkServerUrl:server,esploraUrl:mainnetProbe ? 'https://mempool.space/api' : 'https://mutinynet.com/api',settlementConfig:false});
   transport = nostrRfqTransport({relays:['wss://nostr.arkade.sh'],solverPubkey:pinned,timeoutMs:15000});
   const venue = new ArkadeIntentsVenue({wallet,arkServerUrl:server,transport,store});
-  if(opts.prepare) {
+  if(opts.inspect) {
+    const reviews = Object.values(records).map((r:any)=>{try{return reviewReceive(r,mainnetProbe?'bitcoin':'mutinynet',null);}catch(e:any){return {id:r.id,phase:r.phase,paymentAuthorized:false,reason:e.message};}});
+    console.log(JSON.stringify({reviews,balance:await wallet.getBalance()},(_,v)=>typeof v==='bigint'?v.toString():v,2));
+  } else if(opts.prepare) {
     const result = await venue.prepareLightningReceive({amountSats:amount,maxPayAmountSats:maxPay,amountSide:'to',decodeInvoice:(invoice:string)=>invoiceFacts(invoice,mainnetProbe ? 'bitcoin' : 'mutinynet')
     });
     // Never print an invoice before the SDK has verified it and persisted recovery.
