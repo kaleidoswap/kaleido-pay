@@ -67,3 +67,19 @@ Still outstanding: a funded Mutinynet Lightning payment, claim and spendable
 balance verification, interruption during funded recovery, and exact chain
 compatibility with Mo's Bark backend. The local Bark configuration points at
 Second's signet; do not assume it is Mutinynet or offer that route yet.
+
+## Funded-test attempt (2026-10-01)
+
+The local Lightning test node and Mutinynet explorer agreed on block 3471506
+(`000001822878fda72c8a502b1dee307ee2355002f4d271967c829f69c279904b`).
+The receiver watcher was started before requesting the 2,056-sat payment,
+with a 100-sat routing-fee cap. The local node rejected the request immediately
+with `RouteNotFound` (gRPC failed-precondition). Its two usable channels had
+10,728 and 28,340 sats outbound capacity, so local balance alone was sufficient.
+This does not establish remote liquidity or a usable route to the solver.
+
+No payment was initiated successfully and no incoming claim was observed.
+The receiver remained pending and the watcher was stopped. The attempt and
+wallet recovery data were preserved. Next prerequisite: a Mutinynet Lightning
+payer with a route to this solver, or repair the test node's routing connectivity.
+Do not retry merely by increasing the fee cap or assume Bark signet is compatible.
