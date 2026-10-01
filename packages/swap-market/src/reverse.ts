@@ -111,7 +111,7 @@ export async function waitForLockup(p: {
   zeroConf?: boolean;
   pollMs?: number;
   timeoutMs?: number;
-  onSeen?: (l: Lockup) => void;
+  onSeen?: (l: Lockup) => void | Promise<void>;
   abort?: () => unknown;
 }): Promise<Lockup> {
   const deadline = Date.now() + (p.timeoutMs ?? 60 * 60 * 1000);
@@ -120,7 +120,7 @@ export async function waitForLockup(p: {
     const err = p.abort?.();
     if (err) throw err;
     const seen = await p.esplora.findOutput(p.swap.lockupAddress, p.swap.onchainAmount).catch(() => null);
-    if (seen && !announced) { p.onSeen?.(seen); announced = true; }
+    if (seen && !announced) { await p.onSeen?.(seen); announced = true; }
     if (seen && (seen.confirmed || p.zeroConf)) return seen;
     await new Promise(r => setTimeout(r, p.pollMs ?? 10000));
   }

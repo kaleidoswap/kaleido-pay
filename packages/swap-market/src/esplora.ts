@@ -42,6 +42,11 @@ export class Esplora {
     return null;
   }
 
+  async hasTransaction(txid: string): Promise<boolean> {
+    const tx = await this.get(`/tx/${txid}`);
+    return tx?.txid === txid;
+  }
+
   async broadcast(hex: string): Promise<string> {
     const r = await fetch(this.base + '/tx', { method: 'POST', body: hex });
     const text = await r.text();

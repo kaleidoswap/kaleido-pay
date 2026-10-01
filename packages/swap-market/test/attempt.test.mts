@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import { Transaction } from '@scure/btc-signer';
+import { hexToBytes } from '@noble/hashes/utils';
 import { secp256k1 } from '@noble/curves/secp256k1';
 import { sha256 } from '@noble/hashes/sha256';
 import { ripemd160 } from '@noble/hashes/ripemd160';
@@ -35,9 +37,10 @@ const saved = new Map<string, SwapAttempt>(); const secrets = new Map<string, st
 let paid = false; let failBroadcast = true; const broadcasts: string[] = [];
 const esplora: any = {
   async findOutput() { return paid ? { txid: 'cd'.repeat(32), vout: 0, confirmed: true } : null; },
+  async hasTransaction() { return false; },
   async feeRate() { return 3; },
   async tipHeight() { return lt - 100; },
-  async broadcast(hex: string) { broadcasts.push(hex); if (failBroadcast) { failBroadcast = false; throw new Error('network down'); } return 'ok'; },
+  async broadcast(hex: string) { broadcasts.push(hex); if (failBroadcast) { failBroadcast = false; throw new Error('network down'); } return Transaction.fromRaw(hexToBytes(hex)).id; },
 };
 const deps = {
   attempts: { async save(a: SwapAttempt) { saved.set(a.id, JSON.parse(JSON.stringify(a))); }, async load(id: string) { return saved.get(id) ?? null; }, async list() { return [...saved.values()]; } },
@@ -73,3 +76,18 @@ assert.deepEqual(log.filter((s, i) => s !== log[i - 1]), ['created', 'paying', '
 const never = await resumeAttempt({ ...a, stage: 'created' }, deps);
 assert.equal(never.stage, 'failed', 'an unpaid attempt is never paid on resume');
 console.log('attempt tests passed');
+
+// An unrelated spent/conflicting output is never proof our claim succeeded.
+const conflictDeps = { ...deps, esplora: { ...esplora, async broadcast() { throw new Error('inputs spent or conflict'); } } as any };
+const conflict = await resumeAttempt({ ...resumed, stage: 'claiming' }, conflictDeps);
+assert.equal(conflict.stage, 'claiming');
+const observed = await resumeAttempt(conflict, { ...conflictDeps, esplora: { ...conflictDeps.esplora, async hasTransaction(txid: string) { return txid === conflict.claim!.txid; } } });
+assert.equal(observed.stage, 'claimed');
+
+// A monitoring interruption must remain recoverable without another payment.
+const waiting = { ...a, stage: 'waiting_lockup', claim: undefined, lockup: undefined } as SwapAttempt;
+const interrupted = await resumeAttempt(waiting, { ...deps, timeoutMs: 0 });
+assert.equal(interrupted.stage, 'recoverable');
+const recovered = await resumeAttempt(interrupted, deps);
+assert.equal(recovered.stage, 'claimed');
+console.log('recovery regression tests passed');

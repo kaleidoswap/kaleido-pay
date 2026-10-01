@@ -10,10 +10,11 @@ export type AttemptStage =
   | 'waiting_lockup'
   | 'lockup_seen'
   | 'claiming'       // claim built and saved, broadcast in progress
+  | 'recoverable'    // interrupted monitoring; resume without paying again
   | 'claimed'
   | 'failed';
 
-/** Everything about a payment except its secrets. Safe to persist in plain storage. */
+/** Persist privately: a signed claim includes the preimage in its witness. */
 export interface SwapAttempt {
   id: string;
   requestId?: string;
@@ -91,7 +92,8 @@ export async function payAttempt(a: SwapAttempt, payer: LightningPayer, deps: At
 
 /** Continues an attempt after a restart. Never pays again. */
 export async function resumeAttempt(a: SwapAttempt, deps: AttemptDeps): Promise<SwapAttempt> {
-  if (a.stage === 'claimed' || a.stage === 'failed') return a;
+  if (a.stage === 'claimed') return a;
+  if (a.stage === 'failed' && a.error === 'never paid') return a;
   if (a.stage === 'created') return update(deps, a, { stage: 'failed', error: 'never paid' });
   return finish(a, deps);
 }
@@ -100,9 +102,7 @@ async function finish(a: SwapAttempt, deps: AttemptDeps, abort?: () => unknown):
   const esplora = deps.esplora ?? new Esplora(ESPLORA[a.swap.network]);
   try {
     if (a.claim) {
-      await esplora.broadcast(a.claim.hex).catch(e => {
-        if (!/already|known|missing|spent|conflict/i.test(String(e?.message))) throw e;
-      });
+      await broadcastClaim(esplora, a.claim);
       return update(deps, a, { stage: 'claimed', error: undefined });
     }
     const raw = await deps.secrets.get(secretKey(a.id));
@@ -111,7 +111,7 @@ async function finish(a: SwapAttempt, deps: AttemptDeps, abort?: () => unknown):
     if (a.stage === 'paying') await update(deps, a, { stage: 'waiting_lockup' });
     const lockup = a.lockup?.confirmed || (a.lockup && deps.zeroConf) ? a.lockup : await waitForLockup({
       swap: a.swap, esplora, zeroConf: deps.zeroConf, pollMs: deps.pollMs, timeoutMs: deps.timeoutMs, abort,
-      onSeen: l => { update(deps, a, { stage: 'lockup_seen', lockup: l }); },
+      onSeen: async l => { await update(deps, a, { stage: 'lockup_seen', lockup: l }); },
     });
     const built = buildClaimTx({
       txid: lockup.txid, vout: lockup.vout, amount: a.swap.onchainAmount, redeemScript: a.swap.redeemScript,
@@ -119,11 +119,21 @@ async function finish(a: SwapAttempt, deps: AttemptDeps, abort?: () => unknown):
     });
     // Saved before broadcast: once the preimage is public the claim must survive a crash.
     await update(deps, a, { stage: 'claiming', lockup, claim: built });
-    await esplora.broadcast(built.hex);
+    await broadcastClaim(esplora, built);
     return update(deps, a, { stage: 'claimed' });
   } catch (e: any) {
     const error = String(e?.message ?? e);
     // With a claim built, keep retrying on resume; the lockup is ours until its timeout.
-    return update(deps, a, a.claim ? { stage: 'claiming', error } : { stage: 'failed', error });
+    return update(deps, a, a.claim ? { stage: 'claiming', error } : { stage: 'recoverable', error });
+  }
+}
+
+async function broadcastClaim(esplora: Esplora, claim: NonNullable<SwapAttempt['claim']>): Promise<void> {
+  try {
+    const txid = await esplora.broadcast(claim.hex);
+    if (txid !== claim.txid) throw new Error('broadcast returned another transaction id');
+  } catch (error) {
+    // A lost response is success only if this exact transaction is observable.
+    if (!await esplora.hasTransaction(claim.txid).catch(() => false)) throw error;
   }
 }
