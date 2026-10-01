@@ -1,0 +1,20 @@
+{
+  "name": "@universal-bolt12/swap-market",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "tsx test/claim.test.mts",
+    "offers": "tsx scripts/offers.mts",
+    "create-swap": "tsx scripts/create-swap.mts"
+  },
+  "dependencies": {
+    "@noble/curves": "^1.9.0",
+    "@noble/hashes": "^1.8.0",
+    "@scure/btc-signer": "^1.8.0",
+    "light-bolt11-decoder": "^3.2.0",
+    "nostr-tools": "^2.25.0"
+  },
+  "devDependencies": { "tsx": "^4.20.0" }
+}
