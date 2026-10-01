@@ -10,7 +10,7 @@ npm ci --ignore-scripts
 npm run receive                                  # public registry + Ark server checks
 npm run receive -- --prepare --amount 2000 --max-pay 2200
 npm run receive -- --resume                       # one reconciliation pass
-npm run receive -- --resume --watch               # poll for up to ten minutes
+npm run receive -- --resume --watch               # poll for up to 35 minutes
 npm test
 ```
 
@@ -135,3 +135,9 @@ Read-only mainnet inspection after preparation found the invoice expired and
 all wallet balances zero. Next dependency: identify the Bark mainnet wallet,
 verify its fee enforcement and status recovery, then prepare a fresh approved
 request. The host must keep mainnet and test-network identities separate.
+
+A later mainnet receive was prepared for 9,900 sats, with a 9,946-sat invoice.
+The user will pay from an external Lightning wallet, capped at 10,000 sats
+including routing. This tests LN → Arkade, not Bark → Arkade. Keys and invoice
+are retained only in the ignored runtime directory. Settlement remains unverified
+until the receiver observes and claims the funded lockup.

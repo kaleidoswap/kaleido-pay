@@ -86,7 +86,7 @@ try {
     // Never print an invoice before the SDK has verified it and persisted recovery.
     console.log(JSON.stringify({id:result.record.id,payAmountSats:result.payAmountSats,receiveAmountSats:result.summary.toAmountSats,expiresAt:result.invoiceExpiresAt,invoice:mainnetProbe ? undefined : result.invoice,status:mainnetProbe ? 'mainnet probe only; unfunded; payment not authorized' : 'prepared; unfunded; keep receiver running with --resume'},null,2));
   } else {
-    const deadline = Date.now() + (opts.watch ? 10*60*1000 : 0);
+    const deadline = Date.now() + (opts.watch ? 35*60*1000 : 0);
     do {
       const report = await venue.reconcile();
       console.log(JSON.stringify({settled:report.settled,pending:report.pending,refunded:report.refunded,cancelled:report.cancelled,needsRecovery:report.needsRecovery,errorIds:report.errors.map(e=>e.id)},null,2));

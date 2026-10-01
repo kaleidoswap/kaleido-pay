@@ -48,3 +48,23 @@ Only one executor per attempt may run at a time; the caller must serialize calls
 Offline tests cover claim construction and interrupted execution. No funded swap
 or live Arkade Intents integration is claimed by these tests. Remaining work also
 includes claim fee changes, expired/spent lockups, and final settlement tracking.
+
+## Bark → Arkade orchestration
+
+`createArkadeTransferController` accepts a receiver-verified, persisted request,
+a Bark sender and a receive reconciler. It serializes execution per attempt,
+persists `submitted` before calling the payer, and never pays on restart.
+Completion requires both the matching Lightning payment hash and a settled,
+spendable Arkade receipt for the requested amount. Ambiguous errors remain
+`unknown`, and resume consults both sides without submitting again.
+
+A host must use secure storage, validate request terms with the receive SDK,
+and bind the sender to the correct account and exact network. One controller
+owns each store/account; its in-process lock is not a cross-process lock.
+`payWithLimit` must enforce the approved total and return a pending result for
+hold invoices. It is deliberately not mapped to Bark's raw send call: the
+installed API exposes fee estimation but no per-call spending-limit argument.
+Do not equate an estimate with enforcement or use the adapter's placeholder
+`fee: 0` as the real fee. Until that contract is available, use an external
+Lightning payer for the receive demonstration and do not advertise automated
+Bark mainnet payment as ready.

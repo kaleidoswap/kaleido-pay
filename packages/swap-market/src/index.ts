@@ -8,3 +8,6 @@ export type { SwapAttempt, AttemptStage, AttemptStore, SecretStore, AttemptDeps 
 export type { ReverseStage } from './reverse';
 export { buildClaimTx, checkReverseScript, claimFee } from './htlc';
 export { Esplora, ESPLORA } from './esplora';
+
+export { createArkadeTransferController } from './arkade-transfer';
+export type { ArkadeTransfer, BarkSender, BarkPaymentState, TransferStore, ArkadeReceiver } from './arkade-transfer';

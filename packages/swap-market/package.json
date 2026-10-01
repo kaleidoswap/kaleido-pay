@@ -5,7 +5,7 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "test": "tsx test/claim.test.mts && tsx test/attempt.test.mts",
+    "test": "tsx test/claim.test.mts && tsx test/attempt.test.mts && tsx --test test/arkade-transfer.test.mts",
     "offers": "tsx scripts/offers.mts",
     "create-swap": "tsx scripts/create-swap.mts"
   },
