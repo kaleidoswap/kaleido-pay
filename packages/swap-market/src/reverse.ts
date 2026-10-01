@@ -102,6 +102,57 @@ export type ReverseStage =
   | { stage: 'lockup_seen'; txid: string; confirmed: boolean }
   | { stage: 'claimed'; txid: string; fee: number };
 
+export type Lockup = { txid: string; vout: number; confirmed: boolean };
+
+/** Polls until the server's lockup appears (and confirms, unless `zeroConf`). */
+export async function waitForLockup(p: {
+  swap: Pick<ReverseSwap, 'lockupAddress' | 'onchainAmount'>;
+  esplora: Esplora;
+  zeroConf?: boolean;
+  pollMs?: number;
+  timeoutMs?: number;
+  onSeen?: (l: Lockup) => void;
+  abort?: () => unknown;
+}): Promise<Lockup> {
+  const deadline = Date.now() + (p.timeoutMs ?? 60 * 60 * 1000);
+  let announced = false;
+  while (Date.now() < deadline) {
+    const err = p.abort?.();
+    if (err) throw err;
+    const seen = await p.esplora.findOutput(p.swap.lockupAddress, p.swap.onchainAmount).catch(() => null);
+    if (seen && !announced) { p.onSeen?.(seen); announced = true; }
+    if (seen && (seen.confirmed || p.zeroConf)) return seen;
+    await new Promise(r => setTimeout(r, p.pollMs ?? 10000));
+  }
+  throw new Error('server never locked the swap on-chain');
+}
+
+/** Builds and broadcasts the claim of `lockup` to the swap's destination. */
+export async function claimLockup(p: {
+  swap: Pick<ReverseSwap, 'onchainAmount' | 'redeemScript' | 'preimage' | 'claimPrivkey' | 'destination' | 'network'>;
+  lockup: Lockup;
+  esplora: Esplora;
+  feeRate?: number;
+}): Promise<{ txid: string; fee: number; hex: string }> {
+  const claim = buildClaimTx({
+    txid: p.lockup.txid,
+    vout: p.lockup.vout,
+    amount: p.swap.onchainAmount,
+    redeemScript: p.swap.redeemScript,
+    preimage: p.swap.preimage,
+    claimPrivkey: p.swap.claimPrivkey,
+    destination: p.swap.destination,
+    feeRate: p.feeRate ?? await p.esplora.feeRate(),
+    network: p.swap.network,
+  });
+  await p.esplora.broadcast(claim.hex);
+  return claim;
+}
+
+export function swapInvoices(swap: Pick<ReverseSwap, 'invoice' | 'minerFeeInvoice'>): string[] {
+  return swap.minerFeeInvoice ? [swap.invoice, swap.minerFeeInvoice] : [swap.invoice];
+}
+
 /** Pays the swap, waits for the server's lockup, and claims it to the destination. */
 export async function completeReverseSwap(p: {
   swap: ReverseSwap;
@@ -116,37 +167,16 @@ export async function completeReverseSwap(p: {
   const esplora = p.esplora ?? new Esplora(ESPLORA[swap.network]);
   const say = p.onStage ?? (() => {});
   say({ stage: 'paying' });
-  const invoices = swap.minerFeeInvoice ? [swap.invoice, swap.minerFeeInvoice] : [swap.invoice];
   // The main payment stays pending until our claim reveals the preimage, so don't await it here.
-  const paying = p.payer.payInvoices(invoices);
   let payError: unknown = null;
-  paying.catch(e => { payError = e; });
-
+  p.payer.payInvoices(swapInvoices(swap)).catch(e => { payError = e; });
   say({ stage: 'waiting_lockup' });
-  const deadline = Date.now() + (p.timeoutMs ?? 60 * 60 * 1000);
-  let seen: { txid: string; vout: number; confirmed: boolean } | null = null;
-  let announced = false;
-  while (Date.now() < deadline) {
-    if (payError) throw payError;
-    seen = await esplora.findOutput(swap.lockupAddress, swap.onchainAmount).catch(() => null);
-    if (seen && !announced) { say({ stage: 'lockup_seen', txid: seen.txid, confirmed: seen.confirmed }); announced = true; }
-    if (seen && (seen.confirmed || p.zeroConf)) break;
-    await new Promise(r => setTimeout(r, p.pollMs ?? 10000));
-  }
-  if (!seen || !(seen.confirmed || p.zeroConf)) throw new Error('server never locked the swap on-chain');
-
-  const claim = buildClaimTx({
-    txid: seen.txid,
-    vout: seen.vout,
-    amount: swap.onchainAmount,
-    redeemScript: swap.redeemScript,
-    preimage: swap.preimage,
-    claimPrivkey: swap.claimPrivkey,
-    destination: swap.destination,
-    feeRate: await esplora.feeRate(),
-    network: swap.network,
+  const lockup = await waitForLockup({
+    swap, esplora, zeroConf: p.zeroConf, pollMs: p.pollMs, timeoutMs: p.timeoutMs,
+    onSeen: l => say({ stage: 'lockup_seen', txid: l.txid, confirmed: l.confirmed }),
+    abort: () => payError,
   });
-  await esplora.broadcast(claim.hex);
+  const claim = await claimLockup({ swap, lockup, esplora });
   say({ stage: 'claimed', txid: claim.txid, fee: claim.fee });
   return { txid: claim.txid, fee: claim.fee };
 }

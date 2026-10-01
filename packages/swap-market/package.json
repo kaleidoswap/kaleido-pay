@@ -5,7 +5,7 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "test": "tsx test/claim.test.mts",
+    "test": "tsx test/claim.test.mts && tsx test/attempt.test.mts",
     "offers": "tsx scripts/offers.mts",
     "create-swap": "tsx scripts/create-swap.mts"
   },
@@ -16,5 +16,11 @@
     "light-bolt11-decoder": "^3.2.0",
     "nostr-tools": "^2.25.0"
   },
-  "devDependencies": { "tsx": "^4.20.0" }
+  "devDependencies": {
+    "tsx": "^4.20.0"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./node": "./src/node.ts"
+  }
 }
