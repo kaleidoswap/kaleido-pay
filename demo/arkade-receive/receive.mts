@@ -10,7 +10,7 @@ import { reviewReceive } from './review.mts';
 import { invoiceFacts } from './invoice.mts';
 
 const { values: opts } = parseArgs({ options: {
-  'mainnet-recovery': { type: 'boolean' }, inspect: { type: 'boolean' }, 'mainnet-probe': { type: 'boolean' }, prepare: { type: 'boolean' }, resume: { type: 'boolean' }, watch: { type: 'boolean' },
+  'fund-send': { type: 'string' }, 'approved-total': { type: 'string' }, 'send-invoice': { type: 'string' }, 'mainnet-recovery': { type: 'boolean' }, inspect: { type: 'boolean' }, 'mainnet-probe': { type: 'boolean' }, prepare: { type: 'boolean' }, resume: { type: 'boolean' }, watch: { type: 'boolean' },
   amount: { type: 'string', default: '2000' },
   'max-pay': { type: 'string', default: '2200' },
 } });
@@ -21,6 +21,8 @@ const mainnetRecovery = !!opts['mainnet-recovery'];
 if (mainnetRecovery && (opts['mainnet-probe'] || !opts.resume)) throw new Error('--mainnet-recovery requires --resume and excludes --mainnet-probe');
 const mainnetProbe = !!opts['mainnet-probe'] || mainnetRecovery;
 if (mainnetProbe && !mainnetRecovery && (opts.resume || opts.watch)) throw new Error('Mainnet probe cannot claim or reconcile');
+if (opts['send-invoice'] && (!opts.prepare || !opts['mainnet-probe'])) throw new Error('--send-invoice requires --mainnet-probe --prepare');
+if (opts['fund-send'] && (!mainnetRecovery || !opts.resume || opts.prepare || opts.inspect || opts.watch)) throw new Error('--fund-send requires --mainnet-recovery --resume exclusively');
 const amount = Number(opts.amount), maxPay = Number(opts['max-pay']);
 if (![amount,maxPay].every(n => Number.isSafeInteger(n) && n > 0) || maxPay < amount) throw new Error('Invalid amounts');
 const network = mainnetProbe ? 'bitcoin' : 'mutinynet';
@@ -77,9 +79,31 @@ try {
   wallet = await Wallet.create({storage:{walletRepository:new SQLiteWalletRepository(sql),contractRepository:new SQLiteContractRepository(sql)},identity,arkServerUrl:server,esploraUrl:mainnetProbe ? 'https://mempool.space/api' : 'https://mutinynet.com/api',settlementConfig:false});
   transport = nostrRfqTransport({relays:['wss://nostr.arkade.sh'],solverPubkey:pinned,timeoutMs:15000});
   const venue = new ArkadeIntentsVenue({wallet,arkServerUrl:server,transport,store});
-  if(opts.inspect) {
+  if(opts['fund-send']) {
+    const id=opts['fund-send'];
+    if(!/^[a-f0-9]{64}$/.test(id)) throw new Error('Invalid swap id');
+    const record=await store.get(id), cap=Number(opts['approved-total']);
+    if(!record || record.route!=='arkade:BTC->lightning:BTC' || record.phase!=='prepared') throw new Error('Send is not prepared');
+    if(!Number.isSafeInteger(cap)||cap<=0||!Number.isSafeInteger(record.fundAmountSats)||record.fundAmountSats>cap) throw new Error('Funding exceeds approval');
+    if(record.quote.valid_until<=Date.now()/1000+30) throw new Error('Quote expired or too close to expiry');
+    const fees=info.fees;
+    if(!fees || Number(fees.txFeeRate)!==0 || Number(fees.intentFee?.offchainInput)!==0 || Number(fees.intentFee?.offchainOutput)!==0) throw new Error('Unexpected Arkade transfer fee policy');
+    const balance=await wallet.getBalance();
+    if(balance.available<record.fundAmountSats) throw new Error('Insufficient spendable Arkade balance');
+    // A lost send response must never cause an automatic duplicate funding.
+    await writeFile(resolve(dir,`fund-${id}.json`),JSON.stringify({id,approvedTotal:cap,amount:record.fundAmountSats,submittedAt:Date.now()}),{mode:0o600,flag:'wx'});
+    const txid=await wallet.sendBitcoin({address:record.address,amount:record.fundAmountSats});
+    await venue.notifyFunded(id,txid);
+    console.log(JSON.stringify({id,fundingTxid:txid,fundedSats:record.fundAmountSats}));
+  } else if(opts.inspect) {
     const reviews = Object.values(records).map((r:any)=>{try{return reviewReceive(r,mainnetProbe?'bitcoin':'mutinynet',null);}catch(e:any){return {id:r.id,phase:r.phase,paymentAuthorized:false,reason:e.message};}});
     console.log(JSON.stringify({reviews,balance:await wallet.getBalance()},(_,v)=>typeof v==='bigint'?v.toString():v,2));
+  } else if(opts['send-invoice']) {
+    const input=JSON.parse(await readFile(resolve(opts['send-invoice']),'utf8'));
+    const invoice=invoiceFacts(input.invoice,'bitcoin');
+    if(invoice.expiresAt <= Date.now()/1000+120) throw new Error('Invoice expires too soon');
+    const result=await venue.prepareLightningSend({invoice});
+    console.log(JSON.stringify({id:result.record.id,fundAmountSats:result.fundAmountSats,receiveAmountSats:invoice.amountSats,feeSats:result.fundAmountSats-invoice.amountSats,validUntil:result.summary.validUntil,withinRequestedLimit:result.fundAmountSats<=maxPay,status:'quoted only; no funds moved'},null,2));
   } else if(opts.prepare) {
     const result = await venue.prepareLightningReceive({amountSats:amount,maxPayAmountSats:maxPay,amountSide:'to',decodeInvoice:(invoice:string)=>invoiceFacts(invoice,mainnetProbe ? 'bitcoin' : 'mutinynet')
     });
@@ -90,7 +114,7 @@ try {
     do {
       // An external payer cannot call notifyFunded; detect its exact lockup on-chain.
       for (const record of await store.listPending()) {
-        if (record.phase !== 'prepared') continue;
+        if (record.phase !== 'prepared' || record.route !== 'lightning:BTC->arkade:BTC') continue;
         const { vtxos } = await new RestIndexerProvider(server).getVtxos({scripts:[record.swapPkScriptHex]});
         if ((vtxos ?? []).some(v => !v.isSpent && v.value >= record.expectedAmountSats)) {
           await venue.notifyFunded(record.id);
