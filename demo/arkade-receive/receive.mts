@@ -3,7 +3,7 @@ import { SQLiteWalletRepository, SQLiteContractRepository } from '@arkade-os/sdk
 import { parseArgs } from 'node:util';
 import { mkdir, readFile, writeFile, rename, open, unlink } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { Wallet, SingleKey } from '@arkade-os/sdk';
+import { Wallet, SingleKey, RestIndexerProvider } from '@arkade-os/sdk';
 import { ArkadeIntentsVenue } from '@kaleidorg/swap-sdk/arkade';
 import { nostrRfqTransport } from '@arkade-os/swap/nostr';
 import { reviewReceive } from './review.mts';
@@ -88,6 +88,14 @@ try {
   } else {
     const deadline = Date.now() + (opts.watch ? 35*60*1000 : 0);
     do {
+      // An external payer cannot call notifyFunded; detect its exact lockup on-chain.
+      for (const record of await store.listPending()) {
+        if (record.phase !== 'prepared') continue;
+        const { vtxos } = await new RestIndexerProvider(server).getVtxos({scripts:[record.swapPkScriptHex]});
+        if ((vtxos ?? []).some(v => !v.isSpent && v.value >= record.expectedAmountSats)) {
+          await venue.notifyFunded(record.id);
+        }
+      }
       const report = await venue.reconcile();
       console.log(JSON.stringify({settled:report.settled,pending:report.pending,refunded:report.refunded,cancelled:report.cancelled,needsRecovery:report.needsRecovery,errorIds:report.errors.map(e=>e.id)},null,2));
       if (!opts.watch || Date.now() >= deadline || !(await store.listPending()).length) break;

@@ -141,3 +141,14 @@ The user will pay from an external Lightning wallet, capped at 10,000 sats
 including routing. This tests LN → Arkade, not Bark → Arkade. Keys and invoice
 are retained only in the ignored runtime directory. Settlement remains unverified
 until the receiver observes and claims the funded lockup.
+
+## Successful mainnet receive (2026-10-02, Europe/Berlin)
+
+External Lightning payment: 9,946 sats. Arkade receive: 9,900 sats.
+The solver reported `filling`, and the indexer showed a 9,900-sat unspent
+lockup. The watcher now detects that funded output for prepared receives and
+calls `notifyFunded` before reconciliation; an external payer cannot call that
+wallet-local API itself. The SDK then completed the claim. Final record phase:
+`settled`; fresh wallet balance: `available=9900`, `preconfirmed=9900`.
+This is spendable Arkade balance, not an on-chain confirmation. External wallet
+routing fees were not observed. This verifies LN → Arkade, not Bark → Arkade.
