@@ -1,5 +1,5 @@
 import { promises as fs } from 'fs';
-import { join } from 'path';
+import { dirname, join } from 'path';
 import type { AttemptStore, SecretStore, SwapAttempt } from './attempt';
 
 /** JSON files, one per attempt. For scripts and tests; the wallet uses its own storage. */
@@ -27,6 +27,7 @@ export class FileSecretStore implements SecretStore {
   async put(key: string, value: string) {
     const all = await this.read();
     all[key] = value;
+    await fs.mkdir(dirname(this.path), { recursive: true });
     await fs.writeFile(this.path, JSON.stringify(all), { mode: 0o600 });
   }
   async get(key: string) {
