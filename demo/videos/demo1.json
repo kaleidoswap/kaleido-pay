@@ -1,0 +1,18 @@
+{
+  "video": "demo1-raw.mov",
+  "out": "kaleidopay-1-pay-with-what-you-have.mp4",
+  "title": "Pay with what you have",
+  "subtitle": "One scan. KaleidoPay reads the receiver's rails from a BOLT12 offer and quotes every way your Bark wallet can pay them.",
+  "footer": "KaleidoPay · Rate on iOS · mainnet quotes, nothing paid · bitcoin++ Berlin 2026",
+  "note": "Mainnet quotes · nothing paid in this demo",
+  "segments": [[0, 2.5], [2.5, 9.0], [9.0, 13.0], [13.0, 20.0], [39.5, 47.0], [47.0, 50.5], [58.0, 64.0]],
+  "steps": [
+    {"t": 0, "title": "Scan the receiver's code", "body": "One BOLT12 offer. Inside it, the receiver's rails in order: Bark, Lightning, on-chain."},
+    {"t": 9.0, "title": "KaleidoPay quotes every route", "body": "Bark, Lightning and swap providers on Nostr, all at once, every fee included."},
+    {"t": 13.0, "title": "Their order, decoded", "body": "Bark first, then Lightning, then on-chain. A plain BOLT12 wallet still sees a normal offer."},
+    {"t": 16.5, "title": "Bark pays their Bark address", "body": "Same Bark server, paid directly. No swap, no fee."},
+    {"t": 20.0, "title": "Every way to pay", "body": "Direct routes first, in the receiver's order. Their choice and the best price are marked."},
+    {"t": 23.5, "title": "Or swap on the way", "body": "Electrum swap providers found on Nostr turn your Lightning payment into on-chain bitcoin."},
+    {"t": 31.0, "title": "Pick any route", "body": "The total updates with its fee. Nothing moves until you confirm."}
+  ]
+}

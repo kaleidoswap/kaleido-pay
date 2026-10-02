@@ -1,0 +1,17 @@
+{
+  "video": "demo2-raw.mov",
+  "out": "kaleidopay-2-the-receiver-decides.mp4",
+  "title": "The receiver decides",
+  "subtitle": "Receive what you want. The receiver's order travels inside the BOLT12 offer; the payer sees their choice next to the cheapest route.",
+  "footer": "KaleidoPay · Rate on iOS · mainnet quotes, nothing paid · bitcoin++ Berlin 2026",
+  "note": "Mainnet quotes · nothing paid in this demo",
+  "segments": [[0, 2.5], [2.5, 8.0], [18.0, 23.5], [23.5, 31.0], [44.5, 50.5], [61.0, 66.5]],
+  "steps": [
+    {"t": 0, "title": "A receiver who wants bitcoin on-chain", "body": "Same shop, different preference: on-chain first, then Lightning, then Bark."},
+    {"t": 8.0, "title": "Scan and quote", "body": "KaleidoPay decodes the rails and asks every route for a price."},
+    {"t": 13.5, "title": "Their order, on screen", "body": "On-chain · Lightning · Bark. The preference travels inside the offer, set when the receiver's node issued it."},
+    {"t": 17.5, "title": "You still see the cheapest", "body": "Bark to their Bark address costs nothing, so it is preselected and marked Best price."},
+    {"t": 21.0, "title": "Their choice vs best price", "body": "Their first choice is marked too, and swap providers found on Nostr are listed for on-chain."},
+    {"t": 27.0, "title": "Pay their way", "body": "Pick their choice: Bark sends on-chain through Second's server, with the fee shown up front."}
+  ]
+}
