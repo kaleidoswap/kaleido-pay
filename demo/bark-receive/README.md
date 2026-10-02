@@ -39,7 +39,7 @@ It verifies quote expiry, available balance, the current zero offchain fee
 policy and the amount cap, then saves an exclusive submission marker before
 sending. If a response is lost, do not delete the marker and retry: inspect
 wallet history and lockup funding first. The SDK handles claim/refund recovery
-through its stored record. No automated funding is part of this Bark probe.
+through its stored record. The receive commands never initiate outgoing funding.
 
 ## Funded mainnet result — 2026-10-02
 
@@ -54,5 +54,37 @@ and verified the same receive and balance.
 
 Arkade available balance: 9,900 → 8,885 sats. Bark spendable balance: 0 → 1,000.
 Observed total cost: 15 sats. No KaleidoSwap maker, Rate UI or native Bark bridge
-was involved. This verifies Arkade → Lightning → Bark on mainnet; the reverse
-Bark → Arkade send and React Native runtime still require their own tests.
+was involved. This verifies Arkade → Lightning → Bark on mainnet; the React Native runtime still requires its own test.
+
+## Bark → Arkade mainnet result — 2026-10-02
+
+The reverse test completed using the same real WASM wallet. Bark paid a 504-sat
+Lightning invoice and Arkade received 500 spendable sats through the public
+solver. Bark reported `paid`; Arkade reconciled to `settled`.
+
+- Bark spendable balance: 1,000 → 476 sats; pending Lightning send: 0.
+- Arkade available/preconfirmed balance: 8,885 → 9,385 sats.
+- Observed total cost: 24 sats (20 Bark + 4 solver).
+- Swap: `ed0070accbd9d020c7493f8b44d35e4b87990766141457e7430d754b166845c3`.
+- Payment hash: `6d6b193c4071d94d55fba56afffe5d656afeb281877d51bed77c2e5bbdddbb0c`.
+
+The outgoing test commands are deliberately limited to a single prepared
+500-sat Arkade receive in the paired harness's private records. Install that
+harness's dependencies too; the probe imports its invoice decoder. Use Node
+with native TypeScript stripping (verified with Node 25).
+
+```sh
+npm run probe -- --send-review
+# Only after approving the mainnet test and starting Arkade recovery --watch:
+npm run probe -- --send --accept-estimated-fee
+npm run probe -- --send-status
+```
+
+The SDK has no hard fee cap. The send command checks the current estimate
+(total at most 600 sats) and a wallet balance no greater than 1,000 sats. These
+are test guards, not a guarantee on the final fee. It requires explicit
+estimated-fee acceptance and records an exclusive submission marker plus the
+payment hash before calling the SDK. If the response is lost, use send-status;
+never delete the marker to retry. Keep receiver reconciliation running while
+the Lightning hold invoice is pending. Final balances above were read after
+reopening both wallets. Native Bark and Rate integration remain unverified.

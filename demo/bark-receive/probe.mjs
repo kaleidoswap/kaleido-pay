@@ -1,6 +1,7 @@
 import {createServer} from 'node:http';
 import {readFile,mkdir,writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
+import {invoiceFacts} from '../arkade-receive/invoice.mts';
 import {chromium} from 'playwright-core';
 process.umask(0o077);
 const state=resolve(import.meta.dirname,'../.attempts/bark-mainnet');
@@ -35,6 +36,28 @@ try{
   return {network:properties.network,balance};
  },mnemonic);
  console.log(JSON.stringify(result,null,2));
+ if(process.argv.includes('--send-review') || process.argv.includes('--send')) {
+  const records=JSON.parse(await readFile(resolve(import.meta.dirname,'../.attempts/arkade-mainnet-probe/records.json'),'utf8'));
+  const pending=Object.values(records).filter(r=>r.route==='lightning:BTC->arkade:BTC'&&r.phase==='prepared');
+  if(pending.length!==1)throw Error('Expected exactly one prepared Arkade receive');
+  const r=pending[0], facts=invoiceFacts(r.invoice,'bitcoin');
+  if(facts.expiresAt<Date.now()/1000+120 || facts.amountSats!==r.payAmountSats || facts.paymentHash!==r.quote.profile.payment_hash || r.expectedAmountSats!==500)throw Error('Unexpected or expired receive');
+  const estimate=await page.evaluate(amount=>globalThis.wallet.estimateLightningSendFee(amount),facts.amountSats);
+  console.log(JSON.stringify({id:r.id,invoiceSats:facts.amountSats,receiveSats:r.expectedAmountSats,estimatedFeeSats:estimate.feeSats,estimatedTotalSats:estimate.grossAmountSats,spendableSats:result.balance.spendableSats,feeCapSupported:false}));
+  if(process.argv.includes('--send')){
+   if(!process.argv.includes('--accept-estimated-fee'))throw Error('SDK has no hard fee cap; explicit estimated-fee acceptance required');
+   if(!Number.isSafeInteger(estimate.feeSats)||estimate.feeSats<0||estimate.grossAmountSats!==facts.amountSats+estimate.feeSats||estimate.grossAmountSats>600||result.balance.spendableSats>1000)throw Error('Unexpected cost or wallet balance');
+   await writeFile(resolve(state,`send-${facts.paymentHash}.json`),JSON.stringify({id:r.id,paymentHash:facts.paymentHash,estimatedTotalSats:estimate.grossAmountSats,submittedAt:Date.now()}),{mode:0o600,flag:'wx'});
+   await writeFile(resolve(state,'outgoing.json'),JSON.stringify({id:r.id,paymentHash:facts.paymentHash}),{mode:0o600});
+   const sent=await page.evaluate(invoice=>globalThis.wallet.payLightningInvoice({invoice,wait:false}),r.invoice);
+   console.log(JSON.stringify({paymentHash:facts.paymentHash,status:sent.type,reportedFeeSats:sent.send?.feeSats}));
+  }
+ }
+ if(process.argv.includes('--send-status')){
+  const {paymentHash}=JSON.parse(await readFile(resolve(state,'outgoing.json'),'utf8'));
+  const status=await page.evaluate(async hash=>{const p=await globalThis.wallet.checkLightningPayment({paymentHash:hash,wait:false});return {paymentHash:hash,status:p.type,reportedFeeSats:p.send?.feeSats,balance:await globalThis.wallet.balance()};},paymentHash);
+  console.log(JSON.stringify(status));await writeFile(resolve(state,'outgoing-status.json'),JSON.stringify(status),{mode:0o600});
+ }
  if(process.argv.includes('--invoice')){
   const invoice=await page.evaluate(()=>globalThis.wallet.bolt11Invoice({amountSats:1000,description:'KaleidoPay Arkade to Bark test'}));
   await writeFile(resolve(state,'receive.json'),JSON.stringify(invoice,null,2),{mode:0o600});

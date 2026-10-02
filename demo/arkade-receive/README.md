@@ -152,3 +152,15 @@ wallet-local API itself. The SDK then completed the claim. Final record phase:
 `settled`; fresh wallet balance: `available=9900`, `preconfirmed=9900`.
 This is spendable Arkade balance, not an on-chain confirmation. External wallet
 routing fees were not observed. This verifies LN → Arkade, not Bark → Arkade.
+
+## Successful Bark → Arkade receive (2026-10-02)
+
+The paired real Bark WASM harness paid 504 sats and the receiver settled swap
+`ed0070accbd9d020c7493f8b44d35e4b87990766141457e7430d754b166845c3`.
+Arkade available/preconfirmed balance increased from 8,885 to 9,385 sats.
+Bark's final status was paid, with 476 spendable sats and no pending send,
+from a 1,000-sat starting balance. Total observed cost: 24 sats, comprising
+20 sats on Bark and 4 sats for the solver. This verifies both directions on
+mainnet with the public solver; it does not verify the React Native bridge.
+See [the Bark harness](../bark-receive/README.md) for commands and the SDK's
+estimate-only fee limitation.
