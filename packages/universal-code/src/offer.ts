@@ -79,7 +79,8 @@ export function acceptedRails(offer: string): string[] {
   const field = decodeOffer(offer).find(f => f.type === SSPS_RAILS);
   const rails: unknown = field ? JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(field.value)) : [];
   validateRails(rails);
-  return rails.includes('ln') ? [...rails] : [...rails, 'ln'];
+  // Lightning is always accepted (SSPS §5.3): bare `ln` or `ln:<network>` already counts.
+  return rails.some(r => r === 'ln' || r.startsWith('ln:')) ? [...rails] : [...rails, 'ln'];
 }
 
 /** Issuer-side only: changing fields changes the offer identity. Register the result with the issuer. */

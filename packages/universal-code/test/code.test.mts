@@ -20,6 +20,8 @@ test('SSPS field roundtrip preserves preference and default LN', () => {
   assert.deepEqual(acceptedRails(extended), ['btc:signet', 'ln']);
   assert.deepEqual(decodeOffer(extended).filter(f => f.type !== SSPS_RAILS), fields);
   assert.deepEqual(acceptedRails(withAcceptedRails(extended, ['ln', 'btc:signet'])), ['ln', 'btc:signet']);
+  assert.deepEqual(acceptedRails(withAcceptedRails(extended, ['btc:mutinynet', 'ln:mutinynet'])), ['btc:mutinynet', 'ln:mutinynet']);
+  assert.deepEqual(acceptedRails(withAcceptedRails(extended, ['btc:signet'])), ['btc:signet', 'ln']);
   assert.throws(() => withAcceptedRails(offer, ['ln','ln']), /Duplicate/);
 });
 test('reject malformed TLVs and encoding', () => {

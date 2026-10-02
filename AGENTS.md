@@ -1,6 +1,8 @@
 # Working in this repo (humans and agents)
 
 ## Ownership
+Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) first: the KaleidoPay flows, the interfaces between tracks (NWC offers, Bark, swaps) and who owns each piece.
+
 Each folder has one owner (see README). Agents work only inside the folder they were assigned. If a change is needed elsewhere, write it in the PR or commit message and leave it to that folder's owner.
 
 ## Branching
