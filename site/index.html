@@ -57,7 +57,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:15px;border-top:1px soli
 <div class="wrap">
 <header>
   <img src="img/ks-full.png" alt="KaleidoSwap">
-  <nav><a href="#demo">Demo</a><a href="#screens">Screens</a><a href="#how">How it works</a><a href="#status">Status</a><a href="#hackathon">Built in Berlin</a><a href="slides/">Slides</a><a href="https://github.com/kaleidoswap/kaleido-pay">Code</a></nav>
+  <nav><a href="#demo">Demo</a><a href="#screens">Screens</a><a href="#how">How it works</a><a href="#nlsp">Beyond Bark</a><a href="#status">Status</a><a href="#hackathon">Built in Berlin</a><a href="slides/">Slides</a><a href="https://github.com/kaleidoswap/kaleido-pay">Code</a></nav>
 </header>
 
 <section class="hero">
@@ -124,6 +124,23 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:15px;border-top:1px soli
     <div class="card"><h3>Why the node issues it</h3><p>LDK recognises its own offers with an HMAC over every record, so rails can't be added afterwards. We patched <a href="https://github.com/kaleidoswap/rust-lightning/tree/feat/offer-ssps-rails">rust-lightning</a>, <a href="https://github.com/kaleidoswap/ldk-node/tree/feat/offer-ssps-rails">ldk-node</a> and <a href="https://github.com/kaleidoswap/ldk-server/tree/feat/offer-ssps-rails">ldk-server</a> to issue offers with the record, including amountless reusable ones.</p></div>
     <div class="card"><h3>Swaps on an open market</h3><p>Electrum's swap providers advertise on Nostr. KaleidoPay talks to them with Electrum's own protocol: the wallet pays a hold invoice and a prepayment, the provider locks on-chain, the wallet claims to the receiver's address and checks every script itself.</p></div>
   </div>
+</section>
+
+<section id="nlsp">
+  <div class="eyebrow">Beyond Bark</div>
+  <h2>Nostr Lightning Swap Providers</h2>
+  <p class="lead">KaleidoPay is not tied to Bark. The payer's wallet only needs to read the receiver's rails and pay Lightning. A <b>Nostr Lightning Swap Provider</b> announces on Nostr which rails it delivers to, quotes a swap from Lightning, and locks the receiver's asset on the receiver's rail for the same payment hash as the payer's Lightning payment: both settle, or neither.</p>
+  <div class="flow" aria-label="Provider flow">
+    <div class="node"><b>PAYER · ANY WALLET</b>pays sats over Lightning</div><span class="arrow">→</span>
+    <div class="node"><b>NOSTR LIGHTNING SWAP PROVIDER</b>quotes, then locks for the same hash</div><span class="arrow">→</span>
+    <div class="node"><b>RECEIVER</b>BTC · L-BTC · USDT on Liquid · Ark · RGB</div>
+  </div>
+  <div class="grid g3">
+    <div class="card"><div class="step">LIVE TODAY</div><h3>Electrum's providers</h3><p>The first ones: Lightning → on-chain bitcoin, discovered on Nostr and quoted live on mainnet in Rate. KaleidoPay speaks their protocol and checks every lock itself.</p></div>
+    <div class="card"><div class="step">NEXT · STABLECOINS</div><h3>The receiver wants USDT on Liquid</h3><p>They list <code>liquid:mainnet/&lt;USDt&gt;</code>. The payer pays sats over Lightning; a provider, for example a KaleidoSwap maker, locks USDt on Liquid for the hash; the claim pays the receiver's Liquid address. The payer never holds USDT.</p></div>
+    <div class="card"><div class="step">NEXT · ANY RAIL, ANY WALLET</div><h3>An open market</h3><p>Rails: on-chain, Liquid BTC and assets, Arkade, RGB on Lightning. Payers: Bark today; Arkade, Spark or any Lightning node next. Every provider that can route a payment quotes it, and the wallet shows them side by side.</p></div>
+  </div>
+  <p class="note">Direct routes appear whenever payer and receiver share a layer (Bark to Bark, Arkade to Arkade, Liquid to Liquid). Providers fill every gap in between. The locks and messages are specified in <a href="https://github.com/kaleidoswap/ssps">SSPS</a>.</p>
 </section>
 
 <section id="status">

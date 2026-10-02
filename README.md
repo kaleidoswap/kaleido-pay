@@ -15,6 +15,13 @@ Built at bitcoin++ Berlin, 1–3 October 2026, by Walter and Mo.
 
 Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/bolt12.md](docs/bolt12.md).
 
+### Beyond Bark: Nostr Lightning Swap Providers
+
+The payer's wallet only needs to read the rails and pay Lightning; Bark is the first wallet wired in. A **Nostr Lightning Swap Provider** announces on Nostr which rails it delivers to, quotes a swap from Lightning, and locks the receiver's asset on the receiver's rail for the same payment hash, so both sides settle or neither does.
+
+- **Live today:** Electrum's swap providers (Lightning → on-chain bitcoin), quoted on mainnet in Rate.
+- **Next:** a receiver lists `liquid:mainnet/<USDt asset id>`, the payer pays sats over Lightning, a provider (for example a KaleidoSwap maker) locks USDt on Liquid, and the claim pays the receiver. The same pattern covers L-BTC, Arkade and RGB assets on Lightning, with Arkade, Spark or any Lightning node as the payer.
+
 ## This repository
 
 | Folder | What |

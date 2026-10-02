@@ -1,0 +1,30 @@
+<section id="nlsp" data-transition="fade" style="background:#f4f6f9;color:#142033;font-family:'IBM Plex Sans', Arial, sans-serif;padding:120px 128px;display:flex;flex-direction:column;gap:44px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:28px;letter-spacing:3px;text-transform:uppercase;color:#b05a0c">Beyond Bark</p>
+<h2 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:68px;font-weight:800;line-height:1.1;letter-spacing:-1px">Nostr Lightning Swap Providers</h2>
+<p style="font-size:32px;line-height:1.4;color:#4a5568;max-width:1560px">The payer's wallet only needs to pay Lightning. A provider found on Nostr turns that payment into whatever the receiver listed, locked for the same payment hash: both settle, or neither.</p>
+<div style="display:flex;align-items:center;gap:20px;font-size:28px">
+<div style="background:#ffffff;border:1px solid #d8dee7;border-radius:14px;padding:18px 26px"><span style="font-family:'IBM Plex Mono', monospace;font-size:20px;color:#4a5568;display:block">PAYER · ANY WALLET</span>pays sats over Lightning</div>
+<span style="color:#b05a0c;font-size:36px">→</span>
+<div style="background:#142033;color:#ffffff;border-radius:14px;padding:18px 26px"><span style="font-family:'IBM Plex Mono', monospace;font-size:20px;color:#f6c343;display:block">NOSTR LIGHTNING SWAP PROVIDER</span>quotes, then locks for the hash</div>
+<span style="color:#b05a0c;font-size:36px">→</span>
+<div style="background:#ffffff;border:1px solid #d8dee7;border-radius:14px;padding:18px 26px"><span style="font-family:'IBM Plex Mono', monospace;font-size:20px;color:#4a5568;display:block">RECEIVER · THE RAIL THEY LISTED</span>BTC, L-BTC, USDT on Liquid, Ark…</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:28px">
+<div style="background:#ffffff;padding:32px;border-radius:16px;border:1px solid #d8dee7;display:flex;flex-direction:column;gap:10px">
+<p style="font-family:'IBM Plex Mono', monospace;font-size:20px;color:#2f855a">LIVE TODAY</p>
+<h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:36px;font-weight:700">Electrum's providers</h3>
+<p style="font-size:26px;color:#4a5568;line-height:1.35">Lightning → on-chain bitcoin, announced on Nostr, quoted live on mainnet in the app.</p>
+</div>
+<div style="background:#ffffff;padding:32px;border-radius:16px;border:1px solid #d8dee7;display:flex;flex-direction:column;gap:10px">
+<p style="font-family:'IBM Plex Mono', monospace;font-size:20px;color:#b05a0c">NEXT · STABLECOINS</p>
+<h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:36px;font-weight:700">USDT on Liquid</h3>
+<p style="font-size:26px;color:#4a5568;line-height:1.35">The receiver lists <span style="font-family:'IBM Plex Mono', monospace">liquid:mainnet/&lt;USDt&gt;</span>. The payer pays sats; a provider locks USDt; the claim pays the receiver.</p>
+</div>
+<div style="background:#ffffff;padding:32px;border-radius:16px;border:1px solid #d8dee7;display:flex;flex-direction:column;gap:10px">
+<p style="font-family:'IBM Plex Mono', monospace;font-size:20px;color:#b05a0c">NEXT · ANY RAIL, ANY WALLET</p>
+<h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:36px;font-weight:700">Open market</h3>
+<p style="font-size:26px;color:#4a5568;line-height:1.35">Liquid, Arkade, RGB on Lightning. Arkade, Spark or a node as payer. Every provider that can route quotes.</p>
+</div>
+</div>
+<aside>KaleidoPay is not tied to Bark. The payer's wallet only needs to read the receiver's rails and pay Lightning; Bark is the first wallet we wired. Everything else comes from Nostr Lightning Swap Providers: services that announce on Nostr which rails they deliver to, quote a swap from Lightning, and lock the receiver's asset on the receiver's rail for the same payment hash as the payer's hold invoice, so both settle together or not at all. Electrum's swap providers are the first ones, Lightning to on-chain bitcoin, live on mainnet. The same pattern gives a receiver USDT on Liquid: they list the USDt rail, the payer pays sats over Lightning, a provider such as a KaleidoSwap maker locks USDt on Liquid, and the claim pays the receiver's address. The payer never touches USDT. Same for L-BTC, Arkade, RGB assets on Lightning, and other payer wallets.</aside>
+</section>
