@@ -57,3 +57,9 @@ scan → universal-code (decode, plan) → KaleidoPay account → execute
 - **Receive → Pay:** the code is BIP321 (`universal-code` `encodePaymentCode`), so a plain wallet still pays the address or the offer.
 - **Bark → KaleidoPay:** `connectBarkToKaleidoPay(adapter, network)` registers one account with both routes; screens only call `quotePaymentOffers` / `executePaymentOffer`.
 - **wallet-engine patch:** any change to `BarkReactNativeAdapter.sendPayment` must keep `lno1…` going to `payLightningOffer` until the patch is replaced by a release (`barkOffer.test.ts` in Rate guards it).
+
+## Ordered destination experiment
+
+The universal-code/decoder track adds `kaleidopay_destinations` in provisional odd offer TLV 1000000387, separately from `ssps_rails` and opaque `offer_metadata`. Its versioned envelope carries an explicit network and an ordered list of Arkade/Bark endpoints, with Lightning fallback. This is an experimental local allocation, not an SSPS or BOLT assignment. See [destination review](destinations.md).
+
+This change covers codec, preview and explicit recipient-first rail planning only. The issuer owner must add the field during offer construction (before LDK registration/HMAC); the NWC owner must forward it and fail if unsupported. Neither interface is implemented by this change. Rate must verify network, address and server identity with the relevant SDK before constructing executable routes. Destination order does not authorize spending or provide an atomic swap lock. Existing planner callers retain direct-first behavior unless they request recipient-first ordering.

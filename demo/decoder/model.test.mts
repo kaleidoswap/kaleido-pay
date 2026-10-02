@@ -12,3 +12,13 @@ test('keeps unknown bytes and malformed extension values visible',()=>{
 test('rejects invalid input, duplicate URI offers and non-offer messages',()=>{
  for(const code of ['lni1qq','bad','lno1','bitcoin:?lno='+sample+'&lno='+sample])assert.throws(()=>inspect(code));
 });
+test('displays receiver order with implicit LN fallback and keeps malformed metadata raw',()=>{
+ const report=inspect(sample);
+ assert.deepEqual(report.orderedDestinations.map(d=>d.type),['arkade','bark','lightning']);
+ assert.equal(report.destinations?.network,'mainnet');
+ const broken=inspect(encodeOffer([{type:1000000387n,value:new TextEncoder().encode('{"version":2}')}]));
+ assert.equal(broken.destinations,null);
+ assert.deepEqual(broken.orderedDestinations,[]);
+ assert.equal(broken.fields[0].decoded,null);
+ assert.ok(broken.warnings.some(w=>w.includes('Invalid value')));
+});

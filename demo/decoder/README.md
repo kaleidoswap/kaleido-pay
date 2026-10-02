@@ -32,3 +32,5 @@ Metadata distinction:
 
 Run `npm test --prefix demo/decoder`. Tests cover amount/metadata/rails,
 wrappers, unknown fields, malformed extension values and invalid inputs.
+
+The example also contains provisional `kaleidopay_destinations` (TLV 1000000387): ordered Arkade/Bark endpoints and implicit Lightning fallback. The page displays receiver preference separately from SSPS rails. Example addresses are deliberately not payable. This is shape decoding, not SDK validation or proof of server identity. See [the extension and SSPS review](../../docs/destinations.md).

@@ -7,6 +7,7 @@ export interface PaymentRequest {
   amountSat: number;
   acceptedRails: string[];
   expiresAt?: number;
+  preference?: 'direct-first' | 'recipient-first';
 }
 export interface WalletSource { id: string; rail: string; network: Network }
 export interface SwapCapability { id: string; from: string; to: string; network: Network }
@@ -18,6 +19,7 @@ export function validateRequest(request: PaymentRequest, now = Math.floor(Date.n
   if (!request || typeof request.id !== 'string' || !request.id.trim() || request.id.length > 128) throw new Error('Invalid request ID');
   if (!['mainnet', 'signet', 'mutinynet', 'testnet'].includes(request.network)) throw new Error('Invalid network');
   if (!Number.isSafeInteger(request.amountSat) || request.amountSat <= 0 || request.amountSat > 2100000000000000) throw new Error('Invalid satoshi amount');
+  if (request.preference !== undefined && !['direct-first', 'recipient-first'].includes(request.preference)) throw new Error('Invalid routing preference');
   validateRails(request.acceptedRails);
   if (!request.acceptedRails.length) throw new Error('No accepted rails');
   if (request.expiresAt !== undefined && (!Number.isSafeInteger(request.expiresAt) || request.expiresAt <= now)) throw new Error('Request expired or expiry invalid');
@@ -49,7 +51,12 @@ export function planPayment(request: PaymentRequest, sources: WalletSource[], sw
       }
     }
   }
-  const routes = [...direct, ...routed].filter((r, i, all) => all.findIndex(x => JSON.stringify(x) === JSON.stringify(r)) === i);
+  const candidates = [...direct, ...routed];
+  if (request.preference === 'recipient-first') {
+    const ranks = request.acceptedRails.map(r => resolveRail(r, request.network));
+    candidates.sort((a, b) => ranks.indexOf(a.to) - ranks.indexOf(b.to));
+  }
+  const routes = candidates.filter((r, i, all) => all.findIndex(x => JSON.stringify(x) === JSON.stringify(r)) === i);
   return routes.length ? { status: 'ready', requestId: request.id, route: routes[0], alternatives: routes.slice(1) }
     : { status: 'unsupported', requestId: request.id, reason: 'No explicitly supported direct or single-swap route on this network' };
 }

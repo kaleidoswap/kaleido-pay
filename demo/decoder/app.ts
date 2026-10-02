@@ -10,6 +10,16 @@ function decode(){result.replaceChildren();error.textContent='';try{
  }result.append(grid);
  if(report.issuer)result.append(el('p',`Issuer: ${report.issuer}`));
  for(const warning of report.warnings)result.append(el('div',warning,'warn'));
+ if(report.destinations){
+  result.append(el('h2',`Recipient preference · ${report.destinations.network}`));
+  const list=el('ol','');
+  for(const destination of report.orderedDestinations){
+   const item=el('li','');item.append(el('strong',destination.type));
+   if(destination.type==='lightning')item.append(el('p','Use this BOLT12 offer (fallback unless explicitly ordered).'));
+   else item.append(el('pre',destination.address),el('p',`Server: ${destination.server}`));
+   list.append(item);
+  }result.append(list);
+ }
  result.append(el('h2','Decoded fields'));
  for(const f of report.fields){const d=el('details','');d.append(el('summary',`${f.type} · ${f.name} · ${f.bytes} byte`));if(f.decoded!==null)d.append(el('pre',f.decoded));d.append(el('div',f.optional?'Odd TLV · optional':'Even TLV · mandatory to understand','muted'),el('pre',f.hex||'(empty)'));result.append(d)}
  const raw=el('details','');raw.append(el('summary','Full JSON'),el('pre',JSON.stringify(report,null,2)));result.append(raw);
