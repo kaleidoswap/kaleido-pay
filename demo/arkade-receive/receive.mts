@@ -96,7 +96,7 @@ try {
     await venue.notifyFunded(id,txid);
     console.log(JSON.stringify({id,fundingTxid:txid,fundedSats:record.fundAmountSats}));
   } else if(opts.inspect) {
-    const reviews = Object.values(records).map((r:any)=>{try{return reviewReceive(r,mainnetProbe?'bitcoin':'mutinynet',null);}catch(e:any){return {id:r.id,phase:r.phase,paymentAuthorized:false,reason:e.message};}});
+    const reviews = Object.values(records).map((r:any)=>{if(r.route==='arkade:BTC->lightning:BTC')return {id:r.id,route:r.route,phase:r.phase,fundAmountSats:r.fundAmountSats,paymentAuthorized:false};try{return reviewReceive(r,mainnetProbe?'bitcoin':'mutinynet',null);}catch(e:any){return {id:r.id,phase:r.phase,paymentAuthorized:false,reason:e.message};}});
     console.log(JSON.stringify({reviews,balance:await wallet.getBalance()},(_,v)=>typeof v==='bigint'?v.toString():v,2));
   } else if(opts['send-invoice']) {
     const input=JSON.parse(await readFile(resolve(opts['send-invoice']),'utf8'));

@@ -40,3 +40,19 @@ policy and the amount cap, then saves an exclusive submission marker before
 sending. If a response is lost, do not delete the marker and retry: inspect
 wallet history and lockup funding first. The SDK handles claim/refund recovery
 through its stored record. No automated funding is part of this Bark probe.
+
+## Funded mainnet result — 2026-10-02
+
+The user approved a maximum 1,100-sat debit. After cancelling the old expired,
+unfunded preparation, a fresh quote required 1,015 sats to pay the new 1,000-sat
+Bark invoice. The Arkade funding transaction was
+`99faa2f2974f8a885a02a194df1271d25c38eafc1ff6f1e297a13362f6af7188`.
+Swap `50d0d0189611670b79fea99763a76d0b70ce64991bbfa91387c195194da2df0e`
+reconciled to settled. Bark's real WASM receiver claimed the incoming payment and
+reported settled with 1,000 spendable sats. A fresh process reopened the wallet
+and verified the same receive and balance.
+
+Arkade available balance: 9,900 → 8,885 sats. Bark spendable balance: 0 → 1,000.
+Observed total cost: 15 sats. No KaleidoSwap maker, Rate UI or native Bark bridge
+was involved. This verifies Arkade → Lightning → Bark on mainnet; the reverse
+Bark → Arkade send and React Native runtime still require their own tests.
