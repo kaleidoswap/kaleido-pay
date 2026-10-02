@@ -6,7 +6,8 @@
   ],
   "scripts": {
     "test": "npm test --workspaces --if-present",
-    "pay": "tsx demo/pay-address.mts"
+    "pay": "tsx demo/pay-address.mts",
+    "offer": "tsx demo/universal-offer.mts"
   },
   "devDependencies": {
     "tsx": "^4.20.0"

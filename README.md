@@ -17,6 +17,15 @@ The receiver shares one code listing the rails they accept (on-chain, Lightning,
 
 The wallet side (Bark account, Pay and Receive screens) lives in [kaleidoswap/Rate](https://github.com/kaleidoswap/Rate) on branch `hack/universal-bolt12` and imports the packages from here.
 
+## Universal BOLT12
+
+The payment code is a BOLT12 offer carrying an `ssps_rails` record (type `1000000385`) that lists the rails the issuer accepts. Our forks of rust-lightning, ldk-node and ldk-server issue it; any BOLT12 wallet still pays it as a normal offer. Details, fork links, tests and live offers: [docs/bolt12.md](docs/bolt12.md).
+
+```bash
+npm run offer -- --network mutinynet --amount 5000   # issue one from our ldk-server
+npm run offer -- --decode lno1...                     # read its rails
+```
+
 ## Where this code lives
 
 **KaleidoPay** is the product name: the pay flow in the apps and the pitch. The libraries keep their names.
@@ -39,6 +48,7 @@ The interfaces (`LightningPayer`, `SecretStore`, `AttemptStore`, quote and attem
 npm install
 npm test                                              # offline checks
 npm run offers -w @universal-bolt12/swap-market mainnet   # live providers on Nostr
+npm run offer -- --decode lno1...                          # read a universal offer's rails
 ```
 
 ## Status (2 October, morning)

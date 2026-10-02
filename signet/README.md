@@ -22,6 +22,6 @@ To serve swaps the provider needs:
 
 The plugin mines its own Nostr announcement proof-of-work; the client can also lower its target for this provider.
 
-## ldk-node issuing universal offers (planned)
+## ldk-node/: the node that issues universal offers
 
-LDK includes experimental offer fields in the HMAC it uses to recognise its own offers, so a rails field added to an issued offer makes every invoice request fail. The node must issue the offer with `ssps_rails` inside, which needs a small patch through our forks (rust-lightning → ldk-node → ldk-server).
+Our fork of ldk-server (branch `feat/offer-ssps-rails` of rust-lightning, ldk-node and ldk-server) on signet and Mutinynet. `./run.sh` starts it (`NET=mutinynet` for Mutinynet), `./run.sh cli ...` drives it, and `npm run offer` at the repo root issues and decodes a universal offer. Why the fork is needed and what it changes: [docs/bolt12.md](../docs/bolt12.md).
