@@ -21,6 +21,8 @@ that directory. No keys are printed. Run one instance at a time; the fixed port
 and Chromium profile lock prevent concurrent instances. This wallet is mainnet.
 Creating an invoice does not send funds; --watch may claim incoming funds.
 
+`node ark-info.mjs [mainnet|signet]` prints the Ark server's info (its key is the `bark:<x-only key>` rail id) from a throwaway empty wallet; read-only.
+
 Verified live on 2026-10-02: real WASM initialization, mainnet wallet open,
 zero starting balance and a 1,000-sat Lightning invoice from Second. A later
 process reopened the same wallet and observed awaiting-payment.
