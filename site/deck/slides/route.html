@@ -1,0 +1,40 @@
+<section id="route" data-transition="fade" style="background:#f4f6f9;color:#142033;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:28px;letter-spacing:3px;text-transform:uppercase;color:#b05a0c">Two kinds of route</p>
+<h2 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:72px;font-weight:800;line-height:1.1;letter-spacing:-1px">Pay directly, or through a swap provider</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:48px">
+<div style="display:flex;flex-direction:column;gap:24px;background:#ffffff;padding:48px;border-radius:16px;border:1px solid #d8dee7">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#b05a0c">DIRECT</p>
+<h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:40px;font-weight:700">Pay a layer they accept</h3>
+<div style="display:flex;flex-direction:column;gap:4px">
+<p style="font-size:30px;font-weight:600">Bark → their Bark address</p>
+<p style="font-size:28px;color:#4a5568">Same Bark server, no swap</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px">
+<p style="font-size:30px;font-weight:600">Bark → their BOLT12 offer</p>
+<p style="font-size:28px;color:#4a5568">Over Lightning</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px">
+<p style="font-size:30px;font-weight:600">Bark → their on-chain address</p>
+<p style="font-size:28px;color:#4a5568">Sent through Second's server</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px;background:#ffffff;padding:48px;border-radius:16px;border:1px solid #d8dee7">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#b05a0c">THROUGH A SWAP PROVIDER</p>
+<h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:40px;font-weight:700">Electrum providers on Nostr</h3>
+<div style="display:flex;gap:20px;align-items:start">
+<p style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:40px;font-weight:800;line-height:1;color:#b05a0c">1</p>
+<p style="font-size:30px;line-height:1.35">Bark pays a hold invoice and a prepayment over Lightning</p>
+</div>
+<div style="display:flex;gap:20px;align-items:start">
+<p style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:40px;font-weight:800;line-height:1;color:#b05a0c">2</p>
+<p style="font-size:30px;line-height:1.35">The provider locks coins on-chain</p>
+</div>
+<div style="display:flex;gap:20px;align-items:start">
+<p style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:40px;font-weight:800;line-height:1;color:#b05a0c">3</p>
+<p style="font-size:30px;line-height:1.35">The wallet claims them to the receiver's address</p>
+</div>
+</div>
+</div>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:28px;color:#4a5568">Electrum's own swap protocol over NIP-04 · 4 mainnet providers quoted</p>
+<aside>Direct routes: the payer's wallet already speaks a layer the receiver accepts. Bark pays the receiver's Bark address on the same Bark server with no swap, pays the BOLT12 offer over Lightning, or sends on-chain itself through Second's server. Swap routes: Electrum's swap providers advertise on Nostr, and we talk to them with Electrum's own swap protocol over NIP-04 encrypted messages. Bark pays a hold invoice plus a prepayment over Lightning, the provider locks coins on-chain, and the wallet claims them straight to the receiver's address. On mainnet, four providers quoted about 1,050 to 1,070 sats in fees on 30,000 sats.</aside>
+</section>

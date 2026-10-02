@@ -3,7 +3,7 @@ const http2=require('node:http2'),fs=require('node:fs'),crypto=require('node:cry
 const path=require('node:path');
 const workspace=path.resolve(__dirname,'../..');
 const protobuf=require(process.env.KALEIDOPAY_PROTOBUF_MODULE || path.join(workspace,'Rate/node_modules/protobufjs'));
-const base=process.env.KALEIDOPAY_NODE_DIR || path.join(workspace,'kaleidoswap-maker-rs/e2e/signet-smoke/run');
+const base=process.env.KALEIDOPAY_NODE_DIR || path.join(workspace,'.kaleidopay-node');
 (async()=>{
  const root=await protobuf.load(base+'/ldk-server-src/ldk-server-grpc/src/proto/api.proto');
  const key=fs.readFileSync(base+'/data/signet/api_key').toString('hex');

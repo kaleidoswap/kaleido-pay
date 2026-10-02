@@ -18,7 +18,7 @@ with Electrum swaps and the independent Bark wallet integration.
   `ARKD.BTC`, pair `BTC@LN/BTC@ARK`, minimum 10,000 sats, 1% service fee and zero
   quoted miner fee. This establishes catalogue availability only, not BOLT12
   deployment, complete fees or successful settlement. Limits change with liquidity.
-- `kaleidoswap-maker-rs/crates/maker-api/src/swap/submarine.rs` accepts `offer`
+- The maker's submarine endpoint accepts `offer`
   plus `invoiceAmount` and a refund public key. Offer resolution happens before
   venue derivation; Arkade is included. Never send an invented `preimageHash`.
 - Creation calls `fetch_offer_payout`, waits for the node event, checks the
@@ -108,9 +108,8 @@ It defaults to the workspace's Rate-installed protobufjs and cached recipient
 proto; override `KALEIDOPAY_PROTOBUF_MODULE` and `KALEIDOPAY_NODE_DIR` if needed.
 The gRPC endpoint is intentionally fixed to localhost:13646.
 
-The node race fix is isolated in `.worktrees/ldk-fetch-only`, branch
-`codex/bolt12-fetch-only-gate`, initially based on node revision `86ca542` and subsequently updated to
-preserve deployed revision `35305e7`.
+The node race fix lives on a separate LDK branch, based on node revision `86ca542` and later
+updated to preserve deployed revision `35305e7`.
 It replaces the manual-payment exclusion list with explicit, single-use
 `Bolt12Send` authorizations. Registration holds a mutex across request initiation
 and insertion, so an early invoice event cannot bypass the decision. Fetches,

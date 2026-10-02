@@ -99,6 +99,5 @@ or payments are made.
 
 Sources: [BOLT12](https://github.com/lightning/bolts/blob/master/12-offer-encoding.md),
 [BIP321](https://github.com/bitcoin/bips/blob/master/bip-0321.mediawiki), and the local
-`ssps/ssps.md` §5.3. Experimental field numbers follow this repo's AGENTS.md.
+`ssps/ssps.md` §5.3. Experimental field numbers follow SSPS §5.3.
 
-Integration owner: Walter. Implementation: Codex, scoped to this folder.

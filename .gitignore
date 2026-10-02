@@ -8,3 +8,5 @@ demo/.attempts/
 signet/.attempts/
 
 demo/decoder/dist/
+_site/
+/universal-bolt12

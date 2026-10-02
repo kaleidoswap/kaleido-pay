@@ -1,0 +1,20 @@
+<section id="offers" data-transition="fade" style="background:#f4f6f9;color:#142033;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:56px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:28px;letter-spacing:3px;text-transform:uppercase;color:#b05a0c">How the offer carries it</p>
+<h2 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:80px;font-weight:800;line-height:1.08;letter-spacing:-2px">The order lives inside the BOLT12 offer</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px">
+<div style="display:flex;flex-direction:column;gap:16px;background:#ffffff;padding:40px;border-radius:16px;border:1px solid #d8dee7">
+<h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:40px;font-weight:700">One extra record</h3>
+<p style="font-size:30px;color:#4a5568;line-height:1.4">ssps_rails, TLV 1000000385 (SSPS §5.3). Bark and Arkade entries hold an address and the Ark server's key.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px;background:#ffffff;padding:40px;border-radius:16px;border:1px solid #d8dee7">
+<h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:40px;font-weight:700">Added at creation</h3>
+<p style="font-size:30px;color:#4a5568;line-height:1.4">LDK's HMAC covers every record, so we patched rust-lightning, ldk-node and ldk-server.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px;background:#ffffff;padding:40px;border-radius:16px;border:1px solid #d8dee7">
+<h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:40px;font-weight:700">Other wallets still pay</h3>
+<p style="font-size:30px;color:#4a5568;line-height:1.4">They see a normal BOLT12 offer.</p>
+</div>
+</div>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:28px;color:#4a5568">BIP321: bitcoin:&lt;address&gt;?lno=&lt;offer&gt; · forks on feat/offer-ssps-rails</p>
+<aside>The order travels in an experimental offer record, ssps_rails, TLV type 1000000385, defined in section 5.3 of the open SSPS spec. Bark and Arkade entries carry the receiver's address and the Ark server's key. Lightning is always accepted. A BIP321 link, bitcoin:address?lno=offer, carries the on-chain address next to the offer. The detail people ask about: LDK authenticates its own offers with an HMAC over all records, so a record cannot be appended later; the node must add it when it creates the offer. We patched rust-lightning, ldk-node and ldk-server (branch feat/offer-ssps-rails) so the node issues offers with the record, including amountless reusable ones. A wallet that does not know the record still sees and pays a normal BOLT12 offer.</aside>
+</section>

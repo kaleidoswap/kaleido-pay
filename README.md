@@ -1,69 +1,58 @@
-# Universal BOLT12 (KaleidoPay)
+# KaleidoPay
 
 **Pay with what you have. Receive what you want.**
 
-bitcoin++ Berlin hackathon, 1–3 October 2026. Team: Walter, Mo.
+One reusable BOLT12 QR says which layers the receiver accepts, in order: Bark, Arkade, Lightning, on-chain. The payer's wallet reads it and quotes every route it can pay, directly or through a swap provider found on Nostr. Any other BOLT12 wallet still sees a normal offer.
 
-The receiver shares one code listing the rails they accept (on-chain, Lightning, Bark, Arkade, Liquid). The payer presses one Pay button: the wallet pays directly on a shared rail, or runs the swap inside the payment through a provider found on Nostr, locked on one hash.
+Built at bitcoin++ Berlin, 1–3 October 2026, by Walter and Mo.
 
-| Folder | What | Owner |
-|---|---|---|
-| `packages/swap-market` | Client for Electrum's swap providers over Nostr: discover, request, verify, claim | Walter |
-| `packages/universal-code` | Universal code: BOLT12 offer with the SSPS rails TLV, BIP321 fallback, route planner | Walter |
-| `signet/` | ldk-node on signet issuing universal offers | Walter |
-| `electrum-accelerator/` | Electrum plugin: accelerate stuck transactions and swap claims via mempool's accelerator | Mo |
-| `demo/` | Command-line demo scripts | Walter |
-| `docs/` | One-pager, demo script, pitch notes | Walter |
+**Site, videos and slides:** https://kaleidoswap.github.io/kaleido-pay/
 
-The wallet side (Bark account, Pay and Receive screens) lives in [kaleidoswap/Rate](https://github.com/kaleidoswap/Rate) on branch `hack/universal-bolt12` and imports the packages from here.
+## How it works
 
-## Universal BOLT12
+- **Receiver:** in Rate, connect your LDK node over Nostr Wallet Connect, pick and order the layers you accept, and your node issues one reusable BOLT12 offer carrying that order in an `ssps_rails` record (SSPS §5.3, type `1000000385`). Bark and Arkade entries carry your address; an on-chain address travels next to the offer in a BIP321 link.
+- **Payer:** scan. KaleidoPay shows the receiver's order and quotes every route, fees included: Bark to their Bark address, the offer over Lightning, Bark's on-chain send, or an Electrum swap provider found on Nostr. You pick; nothing moves until you confirm.
 
-The payment code is a BOLT12 offer carrying an `ssps_rails` record (type `1000000385`) that lists the rails the issuer accepts. Our forks of rust-lightning, ldk-node and ldk-server issue it; any BOLT12 wallet still pays it as a normal offer. Details, fork links, tests and live offers: [docs/bolt12.md](docs/bolt12.md).
+Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/bolt12.md](docs/bolt12.md).
 
-```bash
-npm run offer -- --network mutinynet --amount 5000   # issue one from our ldk-server
-npm run offer -- --decode lno1...                     # read its rails
-```
+## This repository
 
-## Where this code lives
-
-**KaleidoPay** is the product name: the pay flow in the apps and the pitch. The libraries keep their names.
-
-- **During the hackathon:** `universal-code` and `swap-market` stay here, as TypeScript imported from source. Rate maps them to this checkout (see `services/kaleidoPay/README.md` there), so a change here shows up in the app without a release. The format and the provider list will still change; this is not ready for a published SDK.
-- **After the hackathon:** the protocol parts move into [swap-sdk](https://github.com/kaleidoswap/swap-sdk)'s Rust core, so the web app, extension, mobile and desktop share them:
-
-| Piece | Destination |
+| Folder | What |
 |---|---|
-| `universal-code`: payment codes, SSPS rails, route planning | swap-sdk core (it is SSPS protocol) |
-| `swap-market`: Electrum swap providers over Nostr | swap-sdk, as another swap venue next to KaleidoSwap makers and the Arkade Intents corridor |
-| KaleidoPay screens: pay button, progress, receipt | the apps (Rate, extension), on top of the SDK |
-| Secret storage, Lightning payer (Bark, Spark) | the app or wallet-engine, passed in through `LightningPayer`, `SecretStore` and `AttemptStore` |
+| `packages/universal-code` | The rails record codec, BIP321 + offer, network detection, route planner |
+| `packages/swap-market` | Client for Electrum's swap providers over Nostr: discover, quote, reverse swap, claim, recovery |
+| `signet/` | Our offer nodes (LDK fork) and Electrum swap providers on signet and Mutinynet |
+| `demo/` | Command-line demos, the offer inspector, and the demo videos |
+| `site/` | The GitHub Pages site and slides |
 
-The interfaces (`LightningPayer`, `SecretStore`, `AttemptStore`, quote and attempt types) are meant to survive that move unchanged, so the port is a translation, not a redesign.
+The app lives in [kaleidoswap/Rate](https://github.com/kaleidoswap/Rate/tree/hack/universal-bolt12) (branch `hack/universal-bolt12`), which imports the packages from here. The LDK changes are on branch `feat/offer-ssps-rails` of our forks of [rust-lightning](https://github.com/kaleidoswap/rust-lightning/tree/feat/offer-ssps-rails), [ldk-node](https://github.com/kaleidoswap/ldk-node/tree/feat/offer-ssps-rails) and [ldk-server](https://github.com/kaleidoswap/ldk-server/tree/feat/offer-ssps-rails). The spec is [kaleidoswap/ssps](https://github.com/kaleidoswap/ssps).
 
 ## Quick start
 
 ```bash
 npm install
-npm test                                              # offline checks
-npm run offers -w @universal-bolt12/swap-market mainnet   # live providers on Nostr
-npm run offer -- --decode lno1...                          # read a universal offer's rails
+npm test                                                  # offline checks
+npm run offers -w @universal-bolt12/swap-market mainnet   # live swap providers on Nostr
+npm run offer -- --decode lno1...                         # read an offer's rails
 ```
 
-## Status (2 October, morning)
+## Status
 
-- [x] **swap-market**: Electrum swap providers over Nostr: discovery, encrypted requests, every reply verified, claim to any address, quotes, persisted attempts, resume after a crash.
-- [x] **Mainnet**: 3 of 7 live providers answered our swap requests and every check passed.
-- [x] **First complete swap** on Mutinynet against our own provider: found on Nostr, both invoices paid (20,090 + 330 sat), lockup [`593fb31d`](https://mutinynet.com/tx/593fb31debfaeb31dd51cec62d3e58dda2cee5c7e44b03a396c48d13ed5b9118), claim [`8c199946`](https://mutinynet.com/tx/8c1999468955a529916c24a8c18e159f2da83ee1ea5b0f8321e05ac76688dd8f) paying exactly 20,000 sat, provider settled. 24 seconds end to end.
-- [x] **Our own Electrum swap provider** (`signet/electrum-provider`) live on Mutinynet and signet, announcing on Nostr.
-- [x] **Universal offers**: BOLT12 offers carrying `ssps_rails` (type 1000000385), issued by our forks of rust-lightning, ldk-node and ldk-server (branch `feat/offer-ssps-rails`). A stock payer pays them (e2e test with real daemons). Live offers on signet and Mutinynet.
-- [x] **universal-code**: offer codec, BIP321 fallback, route planner.
-- [x] **Rate (KaleidoPay)**: imports both packages; executor with parallel quotes, `execute`/`status`, resume on start; pay screen and provider choice (Codex track).
-- [x] Bark in Rate (Mo's adapter, merged): pays KaleidoPay swaps (both provider invoices at once) and BOLT12 offers, with Bark's fee in every quote. Not yet run on a device
-- [ ] Electrum accelerator plugin (Mo)
-- [ ] First paid swap on mainnet with real sats
+Proven:
+- Scan → receiver's order → live quotes for every route, on mainnet in Rate (quotes only).
+- The LDK fork issues offers with the receiver's rails over encrypted NWC (regtest, and signet with a real node); a wallet that doesn't know the record still pays the offer.
+- Electrum swaps over Nostr fully paid and claimed on Mutinynet (24 s and 19 s) with our own provider.
+- Bark pays Lightning and Arkade receives Lightning on mainnet (small amounts).
 
-## Built during the hackathon
+Not yet:
+- A complete payment from Bark through an enriched QR end to end.
+- Arkade paying an Arkade address directly (needs a fee estimate from the wallet library).
+- A per-payment lock (`ssps_lock`) from the receiver instead of a static address.
 
-Everything in this repository was written during the event. Rate and the KaleidoSwap maker existed before; see their branches for hackathon changes.
+## Built at the hackathon
+
+Everything in this repository was written during the event, as were the LDK fork branches, Bark support in wallet-engine and Rate, and KaleidoPay in Rate. Rate, wallet-engine and the SSPS drafts existed before.
+
+## License
+
+MIT

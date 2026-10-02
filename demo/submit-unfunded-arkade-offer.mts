@@ -5,7 +5,7 @@ import { resolve } from 'node:path';
 import { buildOfferRequest, inspectCreateResponse } from './bolt12-arkade-preflight';
 
 if (!process.argv.includes('--create-unfunded')) throw new Error('Pass --create-unfunded after the fetch-only node fix is deployed.');
-const dir = resolve(process.env.KALEIDOPAY_NODE_DIR ?? '../kaleidoswap-maker-rs/e2e/signet-smoke/run');
+const dir = resolve(process.env.KALEIDOPAY_NODE_DIR ?? '.kaleidopay-node');
 const offer = JSON.parse(await readFile(resolve(dir,'kaleidopay-offer.json'),'utf8')).offer;
 const key = createECDH('secp256k1'); key.generateKeys();
 const request = buildOfferRequest(offer,20000,key.getPublicKey('hex','compressed'));

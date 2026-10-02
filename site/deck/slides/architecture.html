@@ -1,0 +1,61 @@
+<section id="architecture" data-transition="fade" style="background:#0f1722;color:#e8edf3;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:36px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:28px;letter-spacing:3px;text-transform:uppercase;color:#e8913a">Architecture</p>
+<h2 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:72px;font-weight:800;line-height:1.1;letter-spacing:-1px">How the pieces connect</h2>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;color:#9fb0c3">RECEIVER · ONCE</p>
+<div style="display:flex;gap:24px;align-items:center">
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#17212f;padding:24px 28px;border-radius:16px;border:1px solid #2a3647">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#e8913a">RECEIVER'S RATE</p>
+<p style="font-size:30px;line-height:1.25">Picks and orders layers</p>
+</div>
+<div style="flex:none;display:flex;flex-direction:column;gap:8px;align-items:center">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#9fb0c3">NWC</p>
+<x-shape kind="arrow-right" style="width:64px;height:32px;background:#e8913a"></x-shape>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#17212f;padding:24px 28px;border-radius:16px;border:1px solid #2a3647">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#e8913a">THEIR LDK NODE</p>
+<p style="font-size:30px;line-height:1.25">Patched fork</p>
+</div>
+<div style="flex:none;display:flex;flex-direction:column;gap:8px;align-items:center">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#9fb0c3">issues</p>
+<x-shape kind="arrow-right" style="width:64px;height:32px;background:#e8913a"></x-shape>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#17212f;padding:24px 28px;border-radius:16px;border:2px solid #e8913a">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#e8913a">ONE REUSABLE QR</p>
+<p style="font-size:30px;line-height:1.25">BOLT12 offer + ssps_rails</p>
+</div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;letter-spacing:2px;color:#9fb0c3">PAYER · EVERY PAYMENT</p>
+<div style="display:flex;gap:24px;align-items:center">
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#17212f;padding:24px 28px;border-radius:16px;border:1px solid #2a3647">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#e8913a">PAYER'S RATE</p>
+<p style="font-size:30px;line-height:1.25">Scans the offer, quotes every route</p>
+</div>
+<div style="flex:none;display:flex;flex-direction:column;gap:8px;align-items:center">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#9fb0c3">picks</p>
+<x-shape kind="arrow-right" style="width:64px;height:32px;background:#e8913a"></x-shape>
+</div>
+<div style="flex:1.4;display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;flex-direction:column;gap:6px;background:#17212f;padding:24px 28px;border-radius:16px;border:1px solid #2a3647">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#e8913a">DIRECT</p>
+<p style="font-size:30px;line-height:1.25">Bark · Lightning · on-chain</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;background:#17212f;padding:24px 28px;border-radius:16px;border:1px solid #2a3647">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#e8913a">OR A SWAP PROVIDER</p>
+<p style="font-size:30px;line-height:1.25">Electrum, found on Nostr</p>
+</div>
+</div>
+<div style="flex:none;display:flex;flex-direction:column;gap:8px;align-items:center">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#9fb0c3">pays</p>
+<x-shape kind="arrow-right" style="width:64px;height:32px;background:#e8913a"></x-shape>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#17212f;padding:24px 28px;border-radius:16px;border:1px solid #2a3647">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#e8913a">RECEIVER</p>
+<p style="font-size:30px;line-height:1.25">Paid on a layer they accept</p>
+</div>
+</div>
+</div>
+<aside>The top row happens once. The receiver's Rate talks to their own LDK node over Nostr Wallet Connect, and the patched node issues one reusable BOLT12 offer with the ordered rails inside. The bottom row happens on every payment. The payer's Rate scans the offer, quotes the direct routes (Bark, Lightning, on-chain) and the Electrum swap providers it finds on Nostr. The payer picks one, and the receiver is paid on a layer they accept.</aside>
+</section>

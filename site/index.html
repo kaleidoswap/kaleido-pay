@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KaleidoPay · Pay with what you have</title>
+<meta name="description" content="One reusable BOLT12 QR that says which layers the receiver accepts. The payer's wallet quotes every route: Bark, Lightning, on-chain, or a swap provider found on Nostr. bitcoin++ Berlin 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{--bg:#071327;--panel:#0d1c36;--line:#1d2f4d;--text:#ecf0f5;--muted:#96a3b8;--green:#2bee79;--amber:#f6c343;--violet:#8b5cf6}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--text);font:400 18px/1.55 'IBM Plex Sans',system-ui,sans-serif}
+a{color:var(--green)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+header{display:flex;align-items:center;justify-content:space-between;padding:22px 0}
+header img{height:30px}
+nav a{color:var(--muted);text-decoration:none;margin-left:22px;font-size:15px}
+nav a:hover{color:var(--text)}
+h1,h2,h3{font-family:'Schibsted Grotesk',system-ui,sans-serif;line-height:1.1}
+h1{font-size:clamp(40px,6vw,72px);font-weight:800;letter-spacing:-1.5px}
+h1 em{font-style:normal;color:var(--green)}
+h2{font-size:clamp(30px,4vw,44px);font-weight:800;letter-spacing:-.5px;margin-bottom:14px}
+h3{font-size:22px;font-weight:600;margin-bottom:8px}
+.eyebrow{font:500 13px 'IBM Plex Mono',monospace;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:12px}
+.lead{font-size:21px;color:var(--muted);max-width:760px;margin:18px 0 28px}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-block;padding:12px 20px;border-radius:999px;background:var(--green);color:#052014;font-weight:600;text-decoration:none}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+section{padding:72px 0;border-top:1px solid var(--line)}
+.hero{padding:40px 0 72px;border:0}
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px}
+.card p,.card li{color:var(--muted)}
+.step{font:500 12px 'IBM Plex Mono',monospace;color:var(--green);letter-spacing:1.5px;margin-bottom:10px}
+video{width:100%;border-radius:14px;border:1px solid var(--line);background:#000;display:block}
+.vcap{color:var(--muted);font-size:15px;margin-top:10px}
+ul{padding-left:20px}
+li{margin:6px 0}
+.tag{display:inline-block;font:500 11px 'IBM Plex Mono',monospace;letter-spacing:1px;padding:3px 8px;border-radius:999px;margin-left:6px;vertical-align:middle}
+.t-new{background:#2bee7922;color:var(--green)}
+.t-old{background:#96a3b822;color:var(--muted)}
+.ok li::marker{content:'✓  ';color:var(--green)}
+.todo li::marker{content:'○  ';color:var(--amber)}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:22px 0}
+.node{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:15px}
+.node b{display:block;font-size:12px;color:var(--muted);font-weight:500;font-family:'IBM Plex Mono',monospace}
+.arrow{color:var(--muted)}
+code{font:500 15px 'IBM Plex Mono',monospace;background:#ffffff10;padding:1px 6px;border-radius:6px}
+footer{padding:40px 0 60px;color:var(--muted);font-size:15px;border-top:1px solid var(--line)}
+.note{font-size:15px;color:var(--muted);margin-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <img src="img/ks-full.png" alt="KaleidoSwap">
+  <nav><a href="#demo">Demo</a><a href="#how">How it works</a><a href="#status">Status</a><a href="#hackathon">Built in Berlin</a><a href="slides/">Slides</a><a href="https://github.com/kaleidoswap/kaleido-pay">Code</a></nav>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">bitcoin++ Berlin 2026 · KaleidoPay</div>
+  <h1>Pay with what you have.<br><em>Receive what you want.</em></h1>
+  <p class="lead">One reusable BOLT12 QR says which layers the receiver accepts, in order: Bark, Arkade, Lightning, on-chain. The payer's wallet reads it and quotes every route it can pay, directly or through a swap provider found on Nostr. Any other BOLT12 wallet still sees a normal offer.</p>
+  <div class="btns"><a class="btn" href="#demo">Watch the demo</a><a class="btn ghost" href="slides/">Slides</a><a class="btn ghost" href="inspector/">Offer inspector</a><a class="btn ghost" href="https://github.com/kaleidoswap/kaleido-pay">Source</a></div>
+</section>
+
+<section id="demo">
+  <div class="eyebrow">Demo</div>
+  <h2>See it in the app</h2>
+  <p class="lead">Recorded from Rate, KaleidoSwap's mobile wallet, on the iOS simulator with live mainnet quotes. Nothing was paid in these recordings.</p>
+  <div class="grid g2">
+    <div><video controls preload="none" poster="img/kaleidopay-1-pay-with-what-you-have.jpg" src="videos/kaleidopay-1-pay-with-what-you-have.mp4"></video><p class="vcap"><b>Pay with what you have</b> (40 s). Scan, see the receiver's order, compare Bark direct, Lightning, on-chain and four Electrum swap providers.</p></div>
+    <div><video controls preload="none" poster="img/kaleidopay-2-the-receiver-decides.jpg" src="videos/kaleidopay-2-the-receiver-decides.mp4"></video><p class="vcap"><b>The receiver decides</b> (35 s). A receiver who prefers on-chain: their choice and the best price are marked separately.</p></div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="eyebrow">How it works</div>
+  <h2>One code, every route</h2>
+  <div class="grid g2">
+    <div class="card">
+      <div class="step">RECEIVER</div>
+      <h3>Say where you want the money</h3>
+      <ul>
+        <li>In Rate, open <i>Receive → Reusable payment QR</i> and connect your own LDK node over Nostr Wallet Connect.</li>
+        <li>Pick the layers you accept and put them in order. Bark and Arkade addresses come from your wallets. The order is saved.</li>
+        <li>Your node issues one reusable BOLT12 offer carrying that order. An on-chain address travels next to it in a BIP321 link.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="step">PAYER</div>
+      <h3>Pay with what you have</h3>
+      <ul>
+        <li>Scan. KaleidoPay decodes the offer and shows <i>They accept, in order</i>.</li>
+        <li>It quotes every route your wallet can pay, every fee included: Bark to their Bark address (no swap), the offer over Lightning, Bark's on-chain send, or an Electrum swap provider found on Nostr.</li>
+        <li><i>Their choice</i> and <i>Best price</i> are marked. You pick; nothing moves until you confirm.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="flow" aria-label="Flow">
+    <div class="node"><b>RECEIVER</b>Rate</div><span class="arrow">→ NWC →</span>
+    <div class="node"><b>LDK FORK</b>issues the offer</div><span class="arrow">→</span>
+    <div class="node"><b>BOLT12 OFFER</b><code>ssps_rails</code> inside</div><span class="arrow">→ scan →</span>
+    <div class="node"><b>PAYER</b>Rate · Bark</div><span class="arrow">→</span>
+    <div class="node"><b>ROUTE</b>Bark · Lightning · on-chain · swap</div>
+  </div>
+  <div class="grid g3">
+    <div class="card"><h3>The record</h3><p><code>ssps_rails</code> is an experimental offer field (type 1000000385) from the open <a href="https://github.com/kaleidoswap/ssps">SSPS spec</a> §5.3: the receiver's rails, most preferred first. Bark and Arkade entries carry the receiver's address and the server's key. Lightning is always accepted.</p></div>
+    <div class="card"><h3>Why the node issues it</h3><p>LDK recognises its own offers with an HMAC over every record, so rails can't be added afterwards. We patched <a href="https://github.com/kaleidoswap/rust-lightning/tree/feat/offer-ssps-rails">rust-lightning</a>, <a href="https://github.com/kaleidoswap/ldk-node/tree/feat/offer-ssps-rails">ldk-node</a> and <a href="https://github.com/kaleidoswap/ldk-server/tree/feat/offer-ssps-rails">ldk-server</a> to issue offers with the record, including amountless reusable ones.</p></div>
+    <div class="card"><h3>Swaps on an open market</h3><p>Electrum's swap providers advertise on Nostr. KaleidoPay talks to them with Electrum's own protocol: the wallet pays a hold invoice and a prepayment, the provider locks on-chain, the wallet claims to the receiver's address and checks every script itself.</p></div>
+  </div>
+</section>
+
+<section id="status">
+  <div class="eyebrow">Status, honestly</div>
+  <h2>What works today</h2>
+  <div class="grid g2">
+    <div class="card ok"><h3>Proven</h3><ul>
+      <li>Scan → receiver's order → live quotes for every route, on <b>mainnet</b> in Rate (iOS simulator). Quotes only.</li>
+      <li>Receiver flow: ordered layers saved; the LDK fork issues the offer with the rails over encrypted NWC (regtest, and signet with a real node); bytes checked after issuance.</li>
+      <li>A wallet that doesn't know the record pays the offer (end-to-end test with real bitcoind and ldk-server).</li>
+      <li>Electrum swaps over Nostr fully paid and claimed on <b>Mutinynet</b> in 24 s and 19 s, with our own provider.</li>
+      <li>Bark pays Lightning and Arkade receives Lightning on <b>mainnet</b> (small amounts).</li>
+      <li>SSPS spec published (CC0) with test vectors.</li>
+    </ul></div>
+    <div class="card todo"><h3>Not yet</h3><ul>
+      <li>A complete payment from Bark through an enriched QR, end to end: receiver and payer have run on different networks so far.</li>
+      <li>Arkade paying an Arkade address directly: the wallet library has no fee estimate to quote with yet.</li>
+      <li>The receiver answering with a per-payment lock (<code>ssps_lock</code>) instead of a static address.</li>
+    </ul><p class="note">The end-to-end demo video uses a real signet receiver node and live quotes; its final payment step is simulated and labelled as such on screen.</p></div>
+  </div>
+</section>
+
+<section id="hackathon">
+  <div class="eyebrow">Built in Berlin, 1–3 October 2026</div>
+  <h2>What existed, and what we built</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Before <span class="tag t-old">EXISTING</span></h3><ul>
+      <li><b>Rate</b>, KaleidoSwap's mobile wallet: Spark, Arkade, RGB, Lightning over NWC, QR scanner.</li>
+      <li><b>wallet-engine</b>, the multi-protocol wallet library behind Rate.</li>
+      <li><b>SSPS</b> drafts (private), including the idea of rails in a BOLT12 offer.</li>
+      <li>A regtest fixture with LDK nodes and an NWC bridge.</li>
+    </ul></div>
+    <div class="card"><h3>Built at the hackathon <span class="tag t-new">NEW</span></h3><ul>
+      <li><b>Bark</b> in wallet-engine and Rate, and Bark paying BOLT12 offers.</li>
+      <li><b>LDK forks</b> that issue offers carrying the receiver's rails, incl. Bark/Arkade addresses and amountless offers.</li>
+      <li><b>NWC methods</b> for reusable offers with ordered rails and receipt lookup.</li>
+      <li><b>universal-code</b>: the rails codec, BIP321 + offer, network detection, route planner.</li>
+      <li><b>swap-market</b>: a client for Electrum's swap providers over Nostr, plus our own providers on signet and Mutinynet.</li>
+      <li><b>KaleidoPay in Rate</b>: receiver layers and reusable QR; payer review with every route, provider comparison, recovery.</li>
+      <li><b>SSPS</b> published, with a Bark rail.</li>
+    </ul></div>
+  </div>
+</section>
+
+<section id="next">
+  <div class="eyebrow">What's next</div>
+  <h2>Where this goes</h2>
+  <div class="grid g3">
+    <div class="card"><h3>One QR for any wallet</h3><p>Bark, Arkade, Lightning, on-chain today; Liquid and RGB Lightning assets next. The receiver states a preference, the payer's wallet finds a route.</p></div>
+    <div class="card"><h3>Providers compete per payment</h3><p>An open market on Nostr: Electrum's providers today, SSPS makers next, each payment quoted by whoever can route it.</p></div>
+    <div class="card"><h3>Per-payment locks</h3><p><code>ssps_lock</code> in the invoice, so a payer can pay on-chain or on Ark without Lightning in between.</p></div>
+    <div class="card"><h3>Upstream</h3><p>A bLIP for the offer record, the LDK changes, and Bark BOLT12 support in wallet-engine.</p></div>
+    <div class="card"><h3>Mainnet receiver</h3><p>A mainnet receiver node behind NWC, then real payments end to end.</p></div>
+  </div>
+</section>
+
+<section id="links">
+  <div class="eyebrow">Links</div>
+  <h2>Code and docs</h2>
+  <div class="grid g2">
+    <div class="card"><ul>
+      <li><a href="https://github.com/kaleidoswap/kaleido-pay">kaleidoswap/kaleido-pay</a>: rails codec, swap-market, demos, this site</li>
+      <li><a href="https://github.com/kaleidoswap/Rate/tree/hack/universal-bolt12">kaleidoswap/Rate</a>, branch <code>hack/universal-bolt12</code>: the app</li>
+      <li><a href="https://github.com/kaleidoswap/ssps">kaleidoswap/ssps</a>: the spec</li>
+      <li><a href="https://github.com/kaleidoswap/wallet-engine/pull/119">wallet-engine #119</a>: Bark pays BOLT12 offers</li>
+    </ul></div>
+    <div class="card"><ul>
+      <li><a href="https://github.com/kaleidoswap/kaleido-pay/blob/main/docs/ARCHITECTURE.md">Architecture</a></li>
+      <li><a href="https://github.com/kaleidoswap/kaleido-pay/blob/main/docs/bolt12.md">Offers with rails, and the LDK forks</a></li>
+      <li><a href="slides/">Slides</a> · <a href="inspector/">Offer inspector</a></li>
+    </ul></div>
+  </div>
+</section>
+</div>
+<footer><div class="wrap">KaleidoPay · Walter and Mo · bitcoin++ Berlin 2026 · <img src="img/bark.png" alt="" style="height:16px;vertical-align:-3px;border-radius:4px"> Bark by Second</div></footer>
+</body>
+</html>

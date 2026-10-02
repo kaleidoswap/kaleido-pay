@@ -1,6 +1,6 @@
 # signet
 
-Signet infrastructure for the demo. Owner: Claude (on Walter's track).
+Signet infrastructure for the demo.
 
 ## electrum-provider/: our own Electrum swap provider
 

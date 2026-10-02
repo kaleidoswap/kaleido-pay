@@ -1,19 +1,10 @@
-# Working in this repo (humans and agents)
+# Contributing
 
-## Ownership
-Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) first: the KaleidoPay flows, the interfaces between tracks (NWC offers, Bark, swaps) and who owns each piece.
-
-Each folder has one owner (see README). Agents work only inside the folder they were assigned. If a change is needed elsewhere, write it in the PR or commit message and leave it to that folder's owner.
-
-## Branching
-Hackathon pace: commit straight to `main` in small commits, pull with rebase before pushing. Never force-push `main`. Several agents may push at once, so keep each commit inside your folder.
-
-## Rules
-- Published text (commits, docs, code) in English.
+- Text in English: commits, docs, code.
 - Minimal comments; match the file around you.
 - No secrets, mnemonics or API keys in the repo. Use `.env` (ignored).
-- Money moves only on signet, or on mainnet with amounts the owner approved (25–50k sats). Never mainnet without the owner saying so.
-- Run `npm test` before pushing. Live tests (`scripts/`) hit real relays and providers; they create swaps but never pay them.
+- Run `npm test` before pushing. Live scripts (`packages/swap-market/scripts/`) hit real relays and providers; they create swaps but never pay them.
+- Move money only on test networks unless you mean to.
 
 ## Protocol facts (verified 1 October 2026)
 - Electrum swap offers: Nostr kind 30315, tags `d=electrum-swapserver-5`, `r=net:<mainnet|signet|testnet|mutinynet>`, `expiration`. Content: `percentage_fee, mining_fee, min_amount, max_forward_amount, max_reverse_amount, relays (comma string), pow_nonce (hex)`.
