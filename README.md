@@ -60,7 +60,7 @@ npm run offer -- --decode lno1...                          # read a universal of
 - [x] **Universal offers**: BOLT12 offers carrying `ssps_rails` (type 1000000385), issued by our forks of rust-lightning, ldk-node and ldk-server (branch `feat/offer-ssps-rails`). A stock payer pays them (e2e test with real daemons). Live offers on signet and Mutinynet.
 - [x] **universal-code**: offer codec, BIP321 fallback, route planner.
 - [x] **Rate (KaleidoPay)**: imports both packages; executor with parallel quotes, `execute`/`status`, resume on start; pay screen and provider choice (Codex track).
-- [ ] Bark as the Lightning payer in Rate (Mo)
+- [x] Bark in Rate (Mo's adapter, merged): pays KaleidoPay swaps (both provider invoices at once) and BOLT12 offers, with Bark's fee in every quote. Not yet run on a device
 - [ ] Electrum accelerator plugin (Mo)
 - [ ] First paid swap on mainnet with real sats
 

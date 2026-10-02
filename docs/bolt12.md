@@ -47,11 +47,11 @@ The node runs on a laptop for the hackathon; when it is offline the offer cannot
 ## How a payer handles it
 
 1. Decode the offer (`packages/universal-code`: `decodeOffer`, `acceptedRails`).
-2. Shared rail? Pay directly: `ln` is a normal BOLT12 payment.
+2. Shared rail? Pay directly: `ln` is a normal BOLT12 payment. In Rate, Bark pays it (`payLightningOffer`), with Bark's fee in the quote.
 3. No shared rail? Build a route that ends on a listed rail through a swap provider. Today that is Lightning → on-chain through Electrum's swap providers on Nostr (`packages/swap-market`), proven on Mutinynet.
 
 ## Not done yet
 
 - The issuer answering an invoice request for an on-chain rail with an `ssps_lock`, so a payer can lock on-chain without Lightning.
-- Bark paying BOLT12 offers from Rate: the native Bark SDK has `payLightningOffer`, but wallet-engine's adapter only handles BOLT11 so far.
+- Bark paying offers ships in Rate through a small wallet-engine patch (`patches/@kaleidorg__wallet-engine@1.0.0-beta.75.patch` on Rate's `hack/universal-bolt12`); it should move into wallet-engine itself. Not yet run on a device.
 - Upstreaming the record as a bLIP.
