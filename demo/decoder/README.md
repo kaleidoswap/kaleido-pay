@@ -19,7 +19,7 @@ Displays standard field names, opaque offer_metadata bytes, exact amounts,
 SSPS rails, unknown TLVs, raw hex and JSON. Invalid custom values remain visible
 as bytes with a warning. Does not decode lni/lnr messages, validate signatures,
 resolve invoices, or determine payment availability. The synthetic example is
-explicitly not payable. A BIP321 wrapper's other fields are not validated here.
+explicitly not payable. A BIP321 wrapper's address, amount, label and message are shown but not validated.
 
 Metadata distinction:
 - Standard field 4, offer_metadata, is opaque issuer data; it is not a generic
@@ -33,7 +33,7 @@ Metadata distinction:
 Run `npm test --prefix demo/decoder`. Tests cover amount/metadata/rails,
 wrappers, unknown fields, malformed extension values and invalid inputs.
 
-The example's `ssps_rails` lists a Bark and an Arkade rail with addresses, then on-chain; Lightning is implicit. Example addresses are deliberately not payable. This is shape decoding, not SDK validation.
+The example is the BIP321 link Rate's Reusable payment QR produces: a reusable (amountless) mainnet offer whose `ssps_rails` lists Arkade then Bark, each with the real public server key of arkade.computer / ark.second.tech, then `btc:mainnet` and `ln:mainnet`, beside an on-chain address. Every address is a placeholder and cannot be paid. The inspector shows the BIP321 address for the `btc` rail, the network, and which known public server an Ark rail's key matches (keys read from the servers on 2026-10-02; a server can rotate its key). This is shape decoding, not SDK validation.
 
 ## Hackathon landing page
 

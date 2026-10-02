@@ -5,7 +5,7 @@ function el(tag:string,text:string,className?:string){const n=document.createEle
 function decode(){result.replaceChildren();error.textContent='';try{
  const report=inspect(input.value);result.append(el('h2',report.description??'Offer without description'));
  const grid=el('div','','summary');
- for(const [label,value] of [['Amount',report.amount??'Not specified'],['Issuer metadata',report.metadataPresent?'Present':'Absent'],['SSPS rails',report.rails?report.rails.join(' · '):'Not declared'],['TLV fields',String(report.fields.length)]]){
+ for(const [label,value] of [['Network',report.network??'Unknown'],['Amount',report.amount??(report.onchain?.amountBtc?`${report.onchain.amountBtc} BTC`:'Any amount · reusable')],['Issuer metadata',report.metadataPresent?'Present':'Absent'],['SSPS rails',report.rails?report.rails.join(' · '):'Not declared'],['TLV fields',String(report.fields.length)]]){
   const metric=el('div','','metric');metric.append(el('span',label,'muted'),el('strong',value));grid.append(metric);
  }result.append(grid);
  if(report.issuer)result.append(el('p',`Issuer: ${report.issuer}`));
@@ -15,8 +15,9 @@ function decode(){result.replaceChildren();error.textContent='';try{
   const list=el('ol','');
   for(const r of report.preference){
    const item=el('li','');item.append(el('strong',r.rail));
-   if(r.address)item.append(el('pre',r.address),el('p','Paid directly to this address by a wallet on the same server.'));
+   if(r.address){item.append(el('pre',r.address));if(r.server)item.append(el('p',`Server key matches ${r.server}.`,'muted'));item.append(el('p','Paid directly to this address by a wallet on the same server.'));}
    else if(r.rail==='ln'||r.rail.startsWith('ln:'))item.append(el('p','Pay this BOLT12 offer.'));
+   else if(r.rail==='btc'||r.rail.startsWith('btc:')){if(report.onchain?.address)item.append(el('pre',report.onchain.address));item.append(el('p',report.onchain?.address?'Paid on-chain to the BIP321 address that travels with the offer.':'No Bitcoin address came with this offer.'));}
    list.append(item);
   }result.append(list);
  }
