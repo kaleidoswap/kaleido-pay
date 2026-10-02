@@ -68,25 +68,52 @@ export function encodeOffer(fields: readonly OfferField[]): string {
   return 'lno1' + bech32.toWords(Uint8Array.from(bytes)).map(n => alphabet[n]).join('');
 }
 
+const RAIL_ID = /^[a-z][a-z0-9-]*(?::[a-zA-Z0-9_./-]+)?$/;
+const ARK_RAIL = /^(arkade|bark):[0-9a-f]{64}$/;
+
 export function validateRails(value: unknown): asserts value is string[] {
-  if (!Array.isArray(value) || value.length > 32 || value.some(r => typeof r !== 'string' || !/^[a-z][a-z0-9-]*(?::[a-zA-Z0-9_./-]+)?$/.test(r) || r.length > 256)) {
+  if (!Array.isArray(value) || value.length > 32 || value.some(r => typeof r !== 'string' || !RAIL_ID.test(r) || r.length > 256)) {
     throw new Error('Invalid rail list');
   }
   if (new Set(value).size !== value.length) throw new Error('Duplicate rail');
 }
 
-export function acceptedRails(offer: string): string[] {
+/** An `ssps_rails` entry: a rail id, or an Ark rail with the issuer's address on it, paid directly. */
+export type RailEntry = string | { rail: string; address: string };
+export interface OfferRail { rail: string; address?: string }
+
+export function validateRailEntries(value: unknown): asserts value is RailEntry[] {
+  if (!Array.isArray(value) || !value.length) throw new Error('Invalid rail list');
+  for (const entry of value) {
+    if (typeof entry === 'string') continue;
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry) || Object.keys(entry).sort().join() !== 'address,rail'
+      || typeof entry.rail !== 'string' || !ARK_RAIL.test(entry.rail)
+      || typeof entry.address !== 'string' || !/^[a-z0-9]{1,2048}$/.test(entry.address)) throw new Error('Invalid rail entry');
+  }
+  validateRails(value.map(e => typeof e === 'string' ? e : e.rail));
+}
+
+/** JCS: sorted object keys, array order kept (it is the issuer's preference). */
+export function encodeRails(entries: RailEntry[]): Uint8Array {
+  validateRailEntries(entries);
+  return new TextEncoder().encode(JSON.stringify(entries.map(e => typeof e === 'string' ? e : { address: e.address, rail: e.rail })));
+}
+
+/** The issuer's rails, most preferred first; Lightning is always accepted, last unless listed (SSPS §5.3). */
+export function offerRails(offer: string): OfferRail[] {
   const field = decodeOffer(offer).find(f => f.type === SSPS_RAILS);
-  const rails: unknown = field ? JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(field.value)) : [];
-  validateRails(rails);
-  // Lightning is always accepted (SSPS §5.3): bare `ln` or `ln:<network>` already counts.
-  return rails.some(r => r === 'ln' || r.startsWith('ln:')) ? [...rails] : [...rails, 'ln'];
+  if (!field) return [{ rail: 'ln' }];
+  const entries: unknown = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(field.value));
+  validateRailEntries(entries);
+  const rails: OfferRail[] = entries.map(e => typeof e === 'string' ? { rail: e } : { rail: e.rail, address: e.address });
+  return rails.some(r => r.rail === 'ln' || r.rail.startsWith('ln:')) ? rails : [...rails, { rail: 'ln' }];
+}
+
+export function acceptedRails(offer: string): string[] {
+  return offerRails(offer).map(r => r.rail);
 }
 
 /** Issuer-side only: changing fields changes the offer identity. Register the result with the issuer. */
-export function withAcceptedRails(offer: string, rails: string[]): string {
-  validateRails(rails);
-  return encodeOffer([...decodeOffer(offer).filter(f => f.type !== SSPS_RAILS), {
-    type: SSPS_RAILS, value: new TextEncoder().encode(JSON.stringify(rails)),
-  }]);
+export function withAcceptedRails(offer: string, rails: RailEntry[]): string {
+  return encodeOffer([...decodeOffer(offer).filter(f => f.type !== SSPS_RAILS), { type: SSPS_RAILS, value: encodeRails(rails) }]);
 }

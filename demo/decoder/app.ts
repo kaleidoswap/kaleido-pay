@@ -10,13 +10,13 @@ function decode(){result.replaceChildren();error.textContent='';try{
  }result.append(grid);
  if(report.issuer)result.append(el('p',`Issuer: ${report.issuer}`));
  for(const warning of report.warnings)result.append(el('div',warning,'warn'));
- if(report.destinations){
-  result.append(el('h2',`Recipient preference · ${report.destinations.network}`));
+ if(report.preference.length){
+  result.append(el('h2','Receiver preference'));
   const list=el('ol','');
-  for(const destination of report.orderedDestinations){
-   const item=el('li','');item.append(el('strong',destination.type));
-   if(destination.type==='lightning')item.append(el('p','Use this BOLT12 offer (fallback unless explicitly ordered).'));
-   else item.append(el('pre',destination.address),el('p',`Server: ${destination.server}`));
+  for(const r of report.preference){
+   const item=el('li','');item.append(el('strong',r.rail));
+   if(r.address)item.append(el('pre',r.address),el('p','Paid directly to this address by a wallet on the same server.'));
+   else if(r.rail==='ln'||r.rail.startsWith('ln:'))item.append(el('p','Pay this BOLT12 offer.'));
    list.append(item);
   }result.append(list);
  }

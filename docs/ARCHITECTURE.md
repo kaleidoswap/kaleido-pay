@@ -17,8 +17,8 @@ Rate shows  bitcoin:<on-chain address>?amount=…&lno=<offer>     (BIP321)
 ```
 
 - The offer comes from **our ldk-server fork** (branch `feat/offer-ssps-rails`), because only it can put `ssps_rails` inside the offer (LDK's offer HMAC covers experimental records, so rails cannot be added afterwards). Bark and Spark cannot issue offers.
-- The app reaches that node over **NWC** (the NWC/BOLT12 track). The NWC request must carry the rails and end in `Bolt12Receive.ssps_rails`; a node without the fork must make the request fail, never silently drop the rails.
-- **Rails list only what works today:** `ln:<network>` (the node) and `btc:<network>`. The `btc` rail is paid to the **BIP321 address**, not to an `ssps_lock`: no issuer answers invoice requests with `ssps_lock` yet. Add `arkade:<server>` or `bark:<server>` only once a payer can actually use them.
+- The app reaches that node over **NWC** (Codex). The NWC request must carry the rails and end in `Bolt12Receive.ssps_rails`; a node without the fork must make the request fail, never silently drop the rails.
+- **One record, the receiver's order.** `ssps_rails` (offer TLV 1000000385) lists where the receiver wants money, most preferred first. An entry is a rail id (`btc:mainnet`, `ln:mainnet`) or a Bark/Arkade rail with the receiver's address, which a payer on the same server pays directly: `{"rail":"bark:<server x-only key>","address":"ark1…"}`. Lightning is always accepted, last unless listed. Build it with `universal-code` `encodeRails` (JCS JSON); never add it to an issued offer. The `btc` rail is paid to the **BIP321 address** (no issuer answers with `ssps_lock` yet).
 - Rail ids follow SSPS: full names (`ln:signet`, `btc:mutinynet`); custom signets are always named (`mutinynet`), because their chain hash is signet's.
 
 ### Pay: one Pay button
@@ -26,15 +26,18 @@ Rate shows  bitcoin:<on-chain address>?amount=…&lno=<offer>     (BIP321)
 ```
 scan → universal-code (decode, plan) → KaleidoPay account → execute
                                           │
+             bark rail, address ──────────┬──▶ Bark sendArkPayment              (direct)
              ln rail, offer ──────────────┼──▶ Bark payLightningOffer           (direct)
              btc rail, address ───────────┴──▶ Electrum providers on Nostr       (swap)
                                                  swap-market: quote, both invoices from Bark,
                                                  verify script, claim to the address
 ```
 
-- **Direct:** Bark pays the offer (`payLightningOffer`). wallet-engine does not expose it yet; Rate carries `patches/@kaleidorg__wallet-engine@1.0.0-beta.75.patch` until wallet-engine ships it.
-- **Swap:** `packages/swap-market` finds Electrum swap providers on Nostr (kind 30315), agrees a reverse swap over NIP-04 (kind 25582), Bark pays the hold invoice and the prepayment together, and the claim pays the receiver's address. Mainnet providers answer; on test networks we run our own (`signet/electrum-provider`).
-- Every quote includes Bark's own Lightning fee (`estimatePaymentFee`); no estimate, no quote.
+- **Direct, receiver's Bark address:** when the offer lists `bark:<key>` with an address and the payer's Bark wallet is on that server (`getConnectionInfo().nodeId`), Bark pays the address (`sendArkPayment`), quoted with `estimatePaymentFee('ark')`.
+- **Direct, Lightning:** Bark pays the offer (`payLightningOffer`). wallet-engine does not expose it yet; Rate carries `patches/@kaleidorg__wallet-engine@1.0.0-beta.75.patch` until [wallet-engine#119](https://github.com/kaleidoswap/wallet-engine/pull/119) ships.
+- **Swap:** `packages/swap-market` finds Electrum swap providers on Nostr (kind 30315), agrees a reverse swap over NIP-04 (kind 25582), Bark pays the hold invoice and the prepayment together, and the claim pays the receiver's address. KaleidoPay lists each provider with its quote. Mainnet providers answer; on test networks we run our own (`signet/electrum-provider`).
+- **Order:** direct routes follow the receiver's order, then swaps; the payer picks. Arkade direct payments wait for a fee estimate from wallet-engine's Arkade adapter.
+- Every quote includes Bark's own fee (`estimatePaymentFee`); no estimate, no quote.
 
 ## Ownership
 
@@ -45,21 +48,15 @@ scan → universal-code (decode, plan) → KaleidoPay account → execute
 | `swap-market`: Electrum providers over Nostr | `packages/swap-market` | Claude (this session) |
 | Our swap providers and offer nodes | `signet/` | Claude |
 | LDK forks (rails in offers) | rust-lightning, ldk-node, ldk-server, branch `feat/offer-ssps-rails` | Claude |
-| KaleidoPay executor: Bark account, swap account, recovery | Rate `services/kaleidoPay/{bark,electrumSwapAccount,lightningPayer,recovery,storage}.ts` | Claude |
-| KaleidoPay screens: Pay, provider choice, receipt, Receive | Rate `screens/`, `components/payments`, `components/receive` | Codex track |
-| Universal offer over NWC (Receive) | Rate NWC client + the node's NWC side | NWC/BOLT12 track |
+| **Payer:** scan, KaleidoPay executor and screen, Bark account, swap account, recovery | Rate `services/kaleidoPay/*` (except `merchantOffer*`), `screens/KaleidoPayScreen.tsx`, `components/payments` | Claude |
+| **Receiver:** preference order (saved), reusable offer over NWC, receipts, Receive | Rate `screens/MerchantOfferScreen.tsx`, `ReceiveScreen`, `components/receive`, `services/kaleidoPay/merchantOffer*`, NWC client; `ldk-test-env/nwc-bridge` | Codex |
 | Bark in wallet-engine and Rate | wallet-engine `BarkReactNativeAdapter`, Rate `services/protocols/bark.ts` | Mo |
 | Electrum accelerator plugin | `electrum-accelerator/` | Mo |
 
 ## Interfaces between tracks
 
-- **NWC → offer:** request `{ amount_sat, description, rails: string[] }`, response `{ offer: "lno1…" }`. The node side calls `Bolt12Receive` with `ssps_rails = JSON.stringify(rails)`.
+- **NWC → offer:** `kaleidopay_make_offer` takes `{ description, amount?, rails: RailEntry[] }` and returns `{ offer, offer_id, amount }`. The node side calls our ldk-server fork's `Bolt12Receive` with `ssps_rails = encodeRails(rails)`; stock ldk-server has no such field, so a node without the fork must fail the request, never drop the rails. The fork accepts object entries and amountless offers.
 - **Receive → Pay:** the code is BIP321 (`universal-code` `encodePaymentCode`), so a plain wallet still pays the address or the offer.
 - **Bark → KaleidoPay:** `connectBarkToKaleidoPay(adapter, network)` registers one account with both routes; screens only call `quotePaymentOffers` / `executePaymentOffer`.
 - **wallet-engine patch:** any change to `BarkReactNativeAdapter.sendPayment` must keep `lno1…` going to `payLightningOffer` until the patch is replaced by a release (`barkOffer.test.ts` in Rate guards it).
 
-## Ordered destination experiment
-
-The universal-code/decoder track adds `kaleidopay_destinations` in provisional odd offer TLV 1000000387, separately from `ssps_rails` and opaque `offer_metadata`. Its versioned envelope carries an explicit network and an ordered list of Arkade/Bark endpoints, with Lightning fallback. This is an experimental local allocation, not an SSPS or BOLT assignment. See [destination review](destinations.md).
-
-This change covers codec, preview and explicit recipient-first rail planning only. The issuer owner must add the field during offer construction (before LDK registration/HMAC); the NWC owner must forward it and fail if unsupported. Neither interface is implemented by this change. Rate must verify network, address and server identity with the relevant SDK before constructing executable routes. Destination order does not authorize spending or provide an atomic swap lock. Existing planner callers retain direct-first behavior unless they request recipient-first ordering.

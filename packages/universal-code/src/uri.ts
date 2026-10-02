@@ -1,5 +1,5 @@
 import { Address, NETWORK, TEST_NETWORK } from '@scure/btc-signer';
-import { decodeOffer } from './offer';
+import { decodeOffer, acceptedRails } from './offer';
 import type { Network } from './plan';
 
 export interface PaymentCode { address?: string; offer?: string; amountSat?: number; label?: string; message?: string }
@@ -56,4 +56,29 @@ export function decodePaymentCode(input: string, network: Network): PaymentCode 
   }
   check(code, network);
   return code;
+}
+
+const CHAINS: Record<string, Network> = {
+  '6fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000': 'mainnet',
+  'f61eee3b63a380a477a063af32b2bbc97c9ff9f01f2c4225e973988108000000': 'signet',
+  '43497fd7f826957108f4a30fd9cec3aeba79972084e90ead01ea330900000000': 'testnet',
+};
+const hex = (b: Uint8Array) => Array.from(b, x => x.toString(16).padStart(2, '0')).join('');
+
+/** The network a scanned code is for, or undefined when it cannot tell (a bare test-network address). */
+export function paymentCodeNetwork(input: string): Network | undefined {
+  const text = input.trim().replace(/^lightning:(\/\/)?/i, '');
+  const query = /^bitcoin:([^?]*)(?:\?(.*))?$/i.exec(text);
+  const offer = query ? new URLSearchParams(query[2] ?? '').get('lno') ?? undefined : /^lno1/i.test(text) ? text : undefined;
+  if (offer) {
+    const chains = decodeOffer(offer).find(f => f.type === 2n);
+    if (!chains) return 'mainnet';
+    if (chains.value.length !== 32) return undefined;
+    const network = CHAINS[hex(chains.value)];
+    // A custom signet shares signet's chain hash; its rails name it (SSPS §1.1).
+    if (network === 'signet' && acceptedRails(offer).some(r => r.endsWith(':mutinynet'))) return 'mutinynet';
+    return network;
+  }
+  const address = query?.[1] ?? '';
+  return /^(bc1|[13])/i.test(address) ? 'mainnet' : undefined;
 }

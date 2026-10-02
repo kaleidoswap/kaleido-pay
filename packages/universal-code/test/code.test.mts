@@ -60,3 +60,28 @@ test('reject expired requests, invalid amounts and contradictory networks', () =
   for (const amountSat of [0, -1, 0.5, NaN, Infinity, Number.MAX_SAFE_INTEGER]) assert.throws(() => validateRequest({...request, amountSat}, 1000));
   assert.throws(() => validateRequest({...request, acceptedRails:['btc:mainnet']}, 1000), /network/);
 });
+test('rails carry Bark and Arkade addresses in preference order, Lightning implicit', async () => {
+  const { offerRails, encodeRails } = await import('../src/index.ts');
+  const bark = 'bark:' + 'b'.repeat(64), arkade = 'arkade:' + 'a'.repeat(64);
+  const extended = withAcceptedRails(offer, [{ rail: bark, address: 'tark1barkaddress' }, 'btc:mainnet', { rail: arkade, address: 'ark1arkadeaddress' }]);
+  assert.deepEqual(offerRails(extended), [{ rail: bark, address: 'tark1barkaddress' }, { rail: 'btc:mainnet' }, { rail: arkade, address: 'ark1arkadeaddress' }, { rail: 'ln' }]);
+  assert.deepEqual(acceptedRails(extended), [bark, 'btc:mainnet', arkade, 'ln']);
+  assert.equal(new TextDecoder().decode(encodeRails([{ address: 'tark1x', rail: bark } as any])), `[{"address":"tark1x","rail":"${bark}"}]`);
+  assert.deepEqual(offerRails(offer), [{ rail: 'ln' }]);
+  for (const bad of [[], [{ rail: 'btc:mainnet', address: 'bc1q' }], [{ rail: 'bark:zz', address: 'tark1' }], [{ rail: bark }], [{ rail: bark, address: 'TARK1' }],
+    [{ rail: bark, address: 'tark1', extra: 1 }], [bark, { rail: bark, address: 'tark1' }]]) {
+    assert.throws(() => withAcceptedRails(offer, bad as any));
+  }
+});
+test('network comes from the offer chain or the address', async () => {
+  const { paymentCodeNetwork } = await import('../src/index.ts');
+  const chain = (h: string) => ({ type: 2n, value: Uint8Array.from(h.match(/../g)!.map(x => parseInt(x, 16))) });
+  const signet = 'f61eee3b63a380a477a063af32b2bbc97c9ff9f01f2c4225e973988108000000';
+  assert.equal(paymentCodeNetwork(offer), 'mainnet');
+  assert.equal(paymentCodeNetwork(encodeOffer([chain(signet), ...fields])), 'signet');
+  assert.equal(paymentCodeNetwork(withAcceptedRails(encodeOffer([chain(signet), ...fields]), ['btc:mutinynet', 'ln:mutinynet'])), 'mutinynet');
+  assert.equal(paymentCodeNetwork(`lightning:${encodeOffer([chain(signet), ...fields])}`), 'signet');
+  assert.equal(paymentCodeNetwork(`bitcoin:tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx?lno=${encodeOffer([chain(signet), ...fields])}`), 'signet');
+  assert.equal(paymentCodeNetwork('bitcoin:bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq?amount=0.0001'), 'mainnet');
+  assert.equal(paymentCodeNetwork('bitcoin:tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx'), undefined);
+});
