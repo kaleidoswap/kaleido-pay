@@ -5,7 +5,10 @@ export interface SwapOffer {
   percentageFee: number;
   miningFee: number;
   minAmount: number;
+  /** Largest reverse swap (we pay Lightning, receive on-chain). Electrum names limits from the
+   *  server's side: its "forward" capacity bounds our reverse swaps. */
   maxForward: number;
+  /** Largest normal swap (we lock on-chain, it pays Lightning). */
   maxReverse: number;
   relays: string[];
   powBits: number;

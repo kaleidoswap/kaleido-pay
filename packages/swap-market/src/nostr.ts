@@ -104,7 +104,7 @@ export function reverseOnchainAmount(o: SwapOffer, lightningSat: number): number
 export function cheapestReverse(offers: SwapOffer[], onchainSat: number): SwapOffer | null {
   const fit = offers.filter(o => {
     const ln = reverseQuote(o, onchainSat);
-    return ln >= o.minAmount && ln <= o.maxReverse;
+    return ln >= o.minAmount && ln <= o.maxForward;
   });
   fit.sort((a, b) => reverseQuote(a, onchainSat) - reverseQuote(b, onchainSat) || b.powBits - a.powBits);
   return fit[0] ?? null;

@@ -34,7 +34,7 @@ const QUOTE_TTL_S = 120;
 export function quoteReverse(offer: SwapOffer, network: SwapNetwork, recipientSat: number, feeRate: number): SwapQuote | null {
   const claim = claimFee(feeRate);
   const payerSat = reverseQuote(offer, recipientSat + claim);
-  if (payerSat < offer.minAmount || payerSat > offer.maxReverse) return null;
+  if (payerSat < offer.minAmount || payerSat > offer.maxForward) return null;
   const onchainSat = reverseOnchainAmount(offer, payerSat);
   return {
     kind: 'reverse',

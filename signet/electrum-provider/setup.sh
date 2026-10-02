@@ -19,5 +19,7 @@ fi
 E -o setconfig plugins.swapserver.enabled true >/dev/null
 E -o setconfig plugins.swapserver.fee_millionths "${FEE_MILLIONTHS:-5000}" >/dev/null
 E -o setconfig use_gossip true >/dev/null
+# Signet fee estimates are absurd (~30k sat per swap); pin the swap fee rate there.
+[ "$NET" = signet ] && E -o setconfig fee_policy.swaps "${SWAP_FEE_POLICY:-feerate:2000}" >/dev/null
 E -o setconfig nostr_relays "${NOSTR_RELAYS:-wss://relay.damus.io,wss://nos.lol,wss://relay.primal.net,wss://relay.getalby.com/v1}" >/dev/null
 echo "setup done for $NET; start with NET=$NET ./run.sh"
