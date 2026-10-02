@@ -1,24 +1,6 @@
-<section id="idea" data-transition="fade" style="background:#0f1722;color:#e8edf3;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:64px">
-<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:28px;letter-spacing:3px;text-transform:uppercase;color:#e8913a">The idea</p>
-<h2 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:80px;font-weight:800;line-height:1.08;letter-spacing:-2px">One code says what you accept.<br><span style="color:#e8913a">The payer pays with what they have.</span></h2>
-<div style="display:flex;gap:32px;align-items:stretch">
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#17212f;padding:40px;border-radius:16px;border:1px solid #2a3647">
-<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#e8913a">RECEIVER</p>
-<h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:38px;font-weight:700">Says what they accept</h3>
-<p style="font-size:30px;color:#9fb0c3;line-height:1.4">Picks layers and puts them in order. Gets one reusable QR.</p>
-</div>
-<x-shape kind="arrow-right" style="width:72px;height:36px;background:#e8913a;align-self:center"></x-shape>
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#17212f;padding:40px;border-radius:16px;border:1px solid #2a3647">
-<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#e8913a">THE CODE</p>
-<h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:38px;font-weight:700">A BOLT12 offer with the order inside</h3>
-<p style="font-size:30px;color:#9fb0c3;line-height:1.4">Any BOLT12 wallet can still pay it.</p>
-</div>
-<x-shape kind="arrow-right" style="width:72px;height:36px;background:#e8913a;align-self:center"></x-shape>
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#17212f;padding:40px;border-radius:16px;border:1px solid #2a3647">
-<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#e8913a">PAYER'S WALLET</p>
-<h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:38px;font-weight:700">Finds a route</h3>
-<p style="font-size:30px;color:#9fb0c3;line-height:1.4">Pays directly, or through a swap provider. Every fee shown first.</p>
-</div>
-</div>
-<aside>The receiver publishes one code: a BOLT12 offer that carries the layers they accept, in order. A wallet that does not understand the extra record pays it as a normal offer. A wallet that does reads the order, quotes every route it can take, and lets the payer pick.</aside>
+<section id="idea" data-transition="fade" style="background:#f4f6f9;color:#142033;font-family:'IBM Plex Sans', Arial, sans-serif;padding:110px 128px;display:flex;flex-direction:column;gap:44px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:26px;letter-spacing:3px;text-transform:uppercase;color:#b05a0c">The idea</p>
+<h2 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:68px;font-weight:800;line-height:1.1;letter-spacing:-1px">A wallet plugin for both sides of a payment</h2>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:28px"><div style="background:#fff;padding:34px;border-radius:16px;border:1px solid #d8dee7;display:flex;flex-direction:column;gap:12px"><p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:20px;color:#b05a0c">RECEIVER</p><h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:36px;font-weight:700;color:#142033">One QR, your priorities</h3><p style="font-size:26px;line-height:1.38;color:#4a5568">Choose every way you accept money and rank them. Share a single reusable code.</p></div><div style="background:#fff;padding:34px;border-radius:16px;border:1px solid #d8dee7;display:flex;flex-direction:column;gap:12px"><p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:20px;color:#b05a0c">PAYER</p><h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:36px;font-weight:700;color:#142033">Pay with what you have</h3><p style="font-size:26px;line-height:1.38;color:#4a5568">Scan any code. Pay directly if you share a layer, otherwise through the best swap provider.</p></div><div style="background:#fff;padding:34px;border-radius:16px;border:1px solid #d8dee7;display:flex;flex-direction:column;gap:12px"><p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:20px;color:#b05a0c">OPEN STANDARD</p><h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:36px;font-weight:700;color:#142033">SSPS</h3><p style="font-size:26px;line-height:1.38;color:#4a5568">Swap providers speak one open protocol, found on Nostr. Any address is payable if one provider supports it.</p></div></div>
+<aside>KaleidoPay sits inside a wallet. For the receiver it builds one QR with ranked options. For the payer it turns any scanned code into a list of routes. The glue between them is SSPS, an open standard for swap providers.</aside>
 </section>

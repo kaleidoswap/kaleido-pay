@@ -1,19 +1,6 @@
-<section id="problem" data-transition="fade" style="background:#f4f6f9;color:#142033;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:64px">
-<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:28px;letter-spacing:3px;text-transform:uppercase;color:#b05a0c">The problem</p>
-<h2 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:80px;font-weight:800;line-height:1.08;letter-spacing:-2px">Bitcoin lives on many layers. A payment code names just one.</h2>
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px">
-<div style="display:flex;flex-direction:column;gap:16px;background:#ffffff;padding:48px;border-radius:16px;border:1px solid #d8dee7">
-<h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:40px;font-weight:700">Different layers</h3>
-<p style="font-size:30px;color:#4a5568;line-height:1.4">Bark, Arkade, Lightning, on-chain. Payer and receiver often hold different ones.</p>
-</div>
-<div style="display:flex;flex-direction:column;gap:16px;background:#ffffff;padding:48px;border-radius:16px;border:1px solid #d8dee7">
-<h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:40px;font-weight:700">No way to say what you accept</h3>
-<p style="font-size:30px;color:#4a5568;line-height:1.4">An invoice or an address names one layer. There is no "this first, then that".</p>
-</div>
-<div style="display:flex;flex-direction:column;gap:16px;background:#ffffff;padding:48px;border-radius:16px;border:1px solid #d8dee7">
-<h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:40px;font-weight:700">Swaps are siloed</h3>
-<p style="font-size:30px;color:#4a5568;line-height:1.4">Each wallet wires in one swap service. If it stops, the feature stops.</p>
-</div>
-</div>
-<aside>Three gaps. First, bitcoin is spread across Ark (Bark and Arkade), Lightning and on-chain, and two people often hold different ones. Second, payment codes name one layer: an invoice is Lightning, an address is on-chain. A receiver has no place to say "I prefer Bark, then Lightning, then on-chain". Third, swaps are wired one to one: a wallet integrates a single swap service, so when that service stops, the wallet loses the feature.</aside>
+<section id="problem" data-transition="fade" style="background:#f4f6f9;color:#142033;font-family:'IBM Plex Sans', Arial, sans-serif;padding:110px 128px;display:flex;flex-direction:column;gap:44px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:26px;letter-spacing:3px;text-transform:uppercase;color:#b05a0c">The problem</p>
+<h2 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:68px;font-weight:800;line-height:1.1;letter-spacing:-1px">Bitcoin lives on many layers. Payments don't.</h2>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:28px"><div style="background:#fff;padding:34px;border-radius:16px;border:1px solid #d8dee7;display:flex;flex-direction:column;gap:12px"><p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:20px;color:#b05a0c">RECEIVER</p><h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:36px;font-weight:700;color:#142033">One code, one layer</h3><p style="font-size:26px;line-height:1.38;color:#4a5568">An invoice is Lightning, an address is on-chain. A merchant can't say "stablecoins first, then Lightning".</p></div><div style="background:#fff;padding:34px;border-radius:16px;border:1px solid #d8dee7;display:flex;flex-direction:column;gap:12px"><p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:20px;color:#b05a0c">PAYER</p><h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:36px;font-weight:700;color:#142033">Holds a different layer</h3><p style="font-size:26px;line-height:1.38;color:#4a5568">The receiver wants Arkade, I hold Bark. Two Ark wallets on different servers can't pay each other.</p></div><div style="background:#fff;padding:34px;border-radius:16px;border:1px solid #d8dee7;display:flex;flex-direction:column;gap:12px"><p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:20px;color:#b05a0c">SWAPS</p><h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:36px;font-weight:700;color:#142033">Siloed</h3><p style="font-size:26px;line-height:1.38;color:#4a5568">Each wallet wires one swap service. No way to compare providers or pay any address out there.</p></div></div>
+<aside>Receivers can only express one layer per code. Payers often hold a different layer than the receiver wants, for example Bark versus Arkade. And swaps are wired one service per wallet, so users cannot compare providers or reach every address type.</aside>
 </section>

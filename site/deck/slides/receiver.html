@@ -1,43 +1,6 @@
-<section id="receiver" data-transition="fade" style="background:#f4f6f9;color:#142033;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
-<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:28px;letter-spacing:3px;text-transform:uppercase;color:#b05a0c">The receiver</p>
-<h2 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:72px;font-weight:800;line-height:1.1;letter-spacing:-1px">Pick your layers, order them, share one QR.</h2>
-<div style="display:grid;grid-template-columns:1fr 640px;gap:80px;align-items:center">
-<div style="display:flex;flex-direction:column;gap:36px">
-<div style="display:flex;gap:24px;align-items:start">
-<p style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:56px;font-weight:800;line-height:1;color:#b05a0c">1</p>
-<p style="font-size:30px;line-height:1.4">Connect your own Lightning node (LDK) over Nostr Wallet Connect.</p>
-</div>
-<div style="display:flex;gap:24px;align-items:start">
-<p style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:56px;font-weight:800;line-height:1;color:#b05a0c">2</p>
-<p style="font-size:30px;line-height:1.4">Choose what you accept: Bark, Arkade, Lightning, on-chain. Put them in order. Rate saves it.</p>
-</div>
-<div style="display:flex;gap:24px;align-items:start">
-<p style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:56px;font-weight:800;line-height:1;color:#b05a0c">3</p>
-<p style="font-size:30px;line-height:1.4">Your node issues one reusable BOLT12 offer with your order inside.</p>
-</div>
-</div>
-<div style="display:flex;flex-direction:column;gap:16px;background:#ffffff;padding:40px;border-radius:16px;border:1px solid #d8dee7">
-<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#b05a0c">RECEIVE · REUSABLE PAYMENT QR</p>
-<div style="display:flex;gap:20px;align-items:center;background:#f4f6f9;padding:18px 24px;border-radius:12px">
-<p style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:36px;font-weight:800;color:#b05a0c">1</p>
-<p style="font-size:32px;font-weight:600">Bark</p>
-<div style="flex:1"></div>
-<p style="font-size:28px;color:#4a5568">Second's Ark</p>
-</div>
-<div style="display:flex;gap:20px;align-items:center;background:#f4f6f9;padding:18px 24px;border-radius:12px">
-<p style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:36px;font-weight:800;color:#b05a0c">2</p>
-<p style="font-size:32px;font-weight:600">Lightning</p>
-<div style="flex:1"></div>
-<p style="font-size:28px;color:#4a5568">always accepted</p>
-</div>
-<div style="display:flex;gap:20px;align-items:center;background:#f4f6f9;padding:18px 24px;border-radius:12px">
-<p style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:36px;font-weight:800;color:#b05a0c">3</p>
-<p style="font-size:32px;font-weight:600">On-chain</p>
-<div style="flex:1"></div>
-<p style="font-size:28px;color:#4a5568">your address</p>
-</div>
-<p style="font-size:28px;color:#4a5568">Saved for future offers.</p>
-</div>
-</div>
-<aside>In Rate: Receive, then "Reusable payment QR". The receiver connects their own Lightning node, an LDK node, over Nostr Wallet Connect. They pick the layers they accept (Bark, which is Second's Ark, Arkade, Lightning, on-chain) and put them in order. Rate saves the preference for future offers. The node then issues one reusable BOLT12 offer with that order inside. Lightning is always accepted, because the offer itself is a Lightning offer.</aside>
+<section id="receiver" data-transition="fade" style="background:#f4f6f9;color:#142033;font-family:'IBM Plex Sans', Arial, sans-serif;padding:110px 128px;display:flex;flex-direction:column;gap:44px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:26px;letter-spacing:3px;text-transform:uppercase;color:#b05a0c">Receiver</p>
+<h2 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:68px;font-weight:800;line-height:1.1;letter-spacing:-1px">One QR. Several ways to be paid. Your priorities.</h2>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:28px"><div style="background:#fff;padding:34px;border-radius:16px;border:1px solid #d8dee7;display:flex;flex-direction:column;gap:12px"><p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:20px;color:#b05a0c">MERCHANT</p><h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:36px;font-weight:700;color:#142033">Stablecoins first</h3><p style="font-size:26px;line-height:1.38;color:#4a5568">USDT on Liquid or RGB as first choice, Lightning as fallback.</p></div><div style="background:#fff;padding:34px;border-radius:16px;border:1px solid #d8dee7;display:flex;flex-direction:column;gap:12px"><p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:20px;color:#b05a0c">ADVANCED USER</p><h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:36px;font-weight:700;color:#142033">Ark first</h3><p style="font-size:26px;line-height:1.38;color:#4a5568">Arkade or Bark before Liquid or on-chain.</p></div><div style="background:#fff;padding:34px;border-radius:16px;border:1px solid #d8dee7;display:flex;flex-direction:column;gap:12px"><p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:20px;color:#b05a0c">ANYONE</p><h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:36px;font-weight:700;color:#142033">Always payable</h3><p style="font-size:26px;line-height:1.38;color:#4a5568">Lightning is always in the list, so every BOLT12 wallet can pay.</p></div></div>
+<aside>The receiver picks every layer they accept and orders them. A merchant may want stablecoins on Liquid or RGB first; an advanced user may prefer Arkade or Bark. Lightning stays as a fallback, so the code is payable by any BOLT12 wallet.</aside>
 </section>

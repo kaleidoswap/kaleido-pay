@@ -1,52 +1,6 @@
-<section id="payer" data-transition="fade" style="background:#0f1722;color:#e8edf3;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:grid;grid-template-columns:1fr 800px;gap:96px;align-items:center">
-<div style="display:flex;flex-direction:column;gap:40px">
-<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:28px;letter-spacing:3px;text-transform:uppercase;color:#e8913a">The payer</p>
-<h2 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:72px;font-weight:800;line-height:1.1;letter-spacing:-1px">Scan. See their order. Pick a route.</h2>
-<div style="display:flex;flex-direction:column;gap:24px">
-<p style="font-size:30px;line-height:1.4;color:#9fb0c3">Every way you can pay, with every fee included.</p>
-<p style="font-size:30px;line-height:1.4;color:#9fb0c3"><span style="color:#e8edf3">Their choice</span> is the receiver's first pick. <span style="color:#e8edf3">Best price</span> is the cheapest.</p>
-<p style="font-size:30px;line-height:1.4;color:#9fb0c3">Nothing moves until you confirm.</p>
-</div>
-</div>
-<div style="display:flex;flex-direction:column;gap:16px;background:#17212f;padding:40px;border-radius:24px;border:1px solid #2a3647">
-<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#9fb0c3">THEY ACCEPT, IN ORDER</p>
-<div style="display:flex;gap:12px">
-<p style="font-size:28px;background:#2a3647;padding:6px 18px;border-radius:999px">1 Bark</p>
-<p style="font-size:28px;background:#2a3647;padding:6px 18px;border-radius:999px">2 Lightning</p>
-<p style="font-size:28px;background:#2a3647;padding:6px 18px;border-radius:999px">3 On-chain</p>
-</div>
-<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#9fb0c3">WAYS TO PAY 30,000 SATS FROM BARK</p>
-<div style="display:flex;align-items:center;justify-content:space-between;gap:24px;background:#0f1722;padding:16px 24px;border-radius:12px;border:2px solid #e8913a">
-<div style="display:flex;flex-direction:column;gap:8px">
-<p style="font-size:30px">Bark → their Bark address</p>
-<div style="display:flex;gap:10px">
-<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1a1208;background:#e8913a;padding:2px 12px;border-radius:999px">Their choice</p>
-<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#0f1722;background:#9fe0c3;padding:2px 12px;border-radius:999px">Best price</p>
-</div>
-</div>
-<p style="font-size:30px;white-space:nowrap">0 sats</p>
-</div>
-<div style="display:flex;align-items:center;justify-content:space-between;gap:24px;background:#0f1722;padding:16px 24px;border-radius:12px;border:1px solid #2a3647">
-<div style="display:flex;flex-direction:column;gap:6px">
-<p style="font-size:30px">Lightning (BOLT12)</p>
-<p style="font-size:28px;color:#9fb0c3">Bark pays the offer</p>
-</div>
-<p style="font-size:30px;white-space:nowrap">150 sats</p>
-</div>
-<div style="display:flex;align-items:center;justify-content:space-between;gap:24px;background:#0f1722;padding:16px 24px;border-radius:12px;border:1px solid #2a3647">
-<div style="display:flex;flex-direction:column;gap:6px">
-<p style="font-size:30px">On-chain send</p>
-<p style="font-size:28px;color:#9fb0c3">Bark, through Second's server</p>
-</div>
-<p style="font-size:30px;white-space:nowrap">~1,000 sats</p>
-</div>
-<div style="display:flex;align-items:center;justify-content:space-between;gap:24px;background:#0f1722;padding:16px 24px;border-radius:12px;border:1px solid #2a3647">
-<div style="display:flex;flex-direction:column;gap:6px">
-<p style="font-size:30px">Electrum swap</p>
-<p style="font-size:28px;color:#9fb0c3">4 providers, found on Nostr</p>
-</div>
-<p style="font-size:30px;white-space:nowrap">~1,050–1,070 sats</p>
-</div>
-</div>
-<aside>The payer uses Rate with a Bark wallet. Scan, and KaleidoPay decodes the offer and shows the receiver's order: here Bark, then Lightning, then on-chain. Then it quotes every way this wallet can pay, every fee included. These are the fees from our mainnet quotes for 30,000 sats. Bark to their Bark address: same Bark server, no swap, 0 sats. Bark paying the BOLT12 offer over Lightning: 150 sats. Bark sending on-chain through Second's server: about 1,000. Four Electrum swap providers: about 1,050 to 1,070. "Their choice" marks the receiver's first preference, "Best price" marks the cheapest; here they are the same route. The payer picks, and nothing moves until they confirm.</aside>
+<section id="payer" data-transition="fade" style="background:#f4f6f9;color:#142033;font-family:'IBM Plex Sans', Arial, sans-serif;padding:110px 128px;display:flex;flex-direction:column;gap:44px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:26px;letter-spacing:3px;text-transform:uppercase;color:#b05a0c">Payer</p>
+<h2 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:68px;font-weight:800;line-height:1.1;letter-spacing:-1px">Scan anything. Direct if possible, swapped if needed.</h2>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:28px"><div style="background:#fff;padding:34px;border-radius:16px;border:1px solid #d8dee7;display:flex;flex-direction:column;gap:12px"><p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:20px;color:#b05a0c">DIRECT</p><h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:36px;font-weight:700;color:#142033">Same layer</h3><p style="font-size:26px;line-height:1.38;color:#4a5568">Two wallets on the same Ark server pay each other. Bark to Bark: no swap, no fee.</p></div><div style="background:#fff;padding:34px;border-radius:16px;border:1px solid #d8dee7;display:flex;flex-direction:column;gap:12px"><p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:20px;color:#b05a0c">THROUGH LIGHTNING</p><h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:36px;font-weight:700;color:#142033">Different layers</h3><p style="font-size:26px;line-height:1.38;color:#4a5568">Receiver on Arkade, payer on Bark: route through Lightning.</p></div><div style="background:#fff;padding:34px;border-radius:16px;border:1px solid #d8dee7;display:flex;flex-direction:column;gap:12px"><p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:20px;color:#b05a0c">THROUGH PROVIDERS</p><h3 style="font-family:'Schibsted Grotesk', Arial, sans-serif;font-size:36px;font-weight:700;color:#142033">Compare and pick</h3><p style="font-size:26px;line-height:1.38;color:#4a5568">Several swap providers quote at once. The wallet shows each total and the payer picks the best.</p></div></div>
+<aside>When you scan, KaleidoPay shows the receiver's priorities and every route your wallet can take. Direct when you share a layer, such as two wallets on the same Ark. Otherwise through Lightning or through swap providers, compared side by side with every fee included.</aside>
 </section>
