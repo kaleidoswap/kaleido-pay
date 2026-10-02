@@ -8,7 +8,7 @@ Spec: [SSPS §5.3 "Rails in an offer"](https://github.com/kaleidoswap/ssps/blob/
 
 | Stream | Type | Value |
 |---|---|---|
-| offer | `1000000385` | `ssps_rails`: JSON array of accepted rail ids, most preferred first, e.g. `["btc:mutinynet","ln:mutinynet"]` |
+| offer | `1000000385` | `ssps_rails`: the receiver's rails, most preferred first. An entry is a rail id, or a Bark/Arkade rail with the receiver's address: `[{"address":"ark1…","rail":"bark:<server key>"},"ln:mainnet","btc:mainnet"]` |
 | invoice_request | `2000000385` | `ssps_rail`: the rail the payer chose and its refund key |
 | invoice | `3000000385` | `ssps_lock`: the lock the payer funds on that rail, signed with the invoice |
 
@@ -46,12 +46,16 @@ The node runs on a laptop for the hackathon; when it is offline the offer cannot
 
 ## How a payer handles it
 
-1. Decode the offer (`packages/universal-code`: `decodeOffer`, `acceptedRails`).
-2. Shared rail? Pay directly: `ln` is a normal BOLT12 payment. In Rate, Bark pays it (`payLightningOffer`), with Bark's fee in the quote.
-3. No shared rail? Build a route that ends on a listed rail through a swap provider. Today that is Lightning → on-chain through Electrum's swap providers on Nostr (`packages/swap-market`), proven on Mutinynet.
+1. Decode the offer and its network (`packages/universal-code`: `offerRails`, `paymentCodeNetwork`).
+2. Take the receiver's order. In Rate, KaleidoPay lists every way the payer's wallets can pay it, quoted with all fees:
+   - **Bark address on the same server:** Bark pays it directly (`sendArkPayment`).
+   - **Lightning:** Bark pays the offer (`payLightningOffer`).
+   - **On-chain:** Bark sends on-chain through its server, or a swap through Electrum's providers on Nostr (`packages/swap-market`), each provider with its own quote.
+3. The payer picks one; the receiver's first choice that the payer can pay directly is first in the list.
 
 ## Not done yet
 
 - The issuer answering an invoice request for an on-chain rail with an `ssps_lock`, so a payer can lock on-chain without Lightning.
-- Bark paying offers ships in Rate through a small wallet-engine patch (`patches/@kaleidorg__wallet-engine@1.0.0-beta.75.patch` on Rate's `hack/universal-bolt12`); it should move into wallet-engine itself. Not yet run on a device.
-- Upstreaming the record as a bLIP.
+- Arkade paying a listed Arkade address: wallet-engine's Arkade adapter has no fee estimate to quote with yet.
+- Bark paying offers ships in Rate through a small wallet-engine patch until [wallet-engine#119](https://github.com/kaleidoswap/wallet-engine/pull/119) is released.
+- Upstreaming the record as a bLIP, and the address entries into SSPS.
