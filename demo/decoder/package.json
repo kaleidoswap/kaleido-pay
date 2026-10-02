@@ -1,1 +1,14 @@
-{"name":"kaleidopay-bolt12-inspector","private":true,"type":"module","scripts":{"start":"tsx server.mts","test":"tsx --test model.test.mts"},"devDependencies":{"esbuild":"0.28.2","tsx":"4.20.0"}}
+{
+  "name": "kaleidopay-bolt12-inspector",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx server.mts",
+    "test": "tsx --test model.test.mts",
+    "build": "tsx build.mts"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "tsx": "4.20.0"
+  }
+}

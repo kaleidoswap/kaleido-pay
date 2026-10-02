@@ -34,3 +34,9 @@ Run `npm test --prefix demo/decoder`. Tests cover amount/metadata/rails,
 wrappers, unknown fields, malformed extension values and invalid inputs.
 
 The example's `ssps_rails` lists a Bark and an Arkade rail with addresses, then on-chain; Lightning is implicit. Example addresses are deliberately not payable. This is shape decoding, not SDK validation.
+
+## Hackathon landing page
+
+The page includes a judge walkthrough, public Rate source/docs links and a distinction between regtest enriched issuance and separate mainnet SDK transfer tests. The universal-bolt12 repository is currently private; do not use its URL as the only judge-facing link.
+
+Run `npm run build --prefix demo/decoder` to generate a static site in `demo/decoder/dist/`. Host that directory with any static hosting service. The bundle contains the explainer and browser-only inspector, not wallet credentials or a payment service. A localhost address is not a public demo link. No hosted demo or video URL has been created by this build.
