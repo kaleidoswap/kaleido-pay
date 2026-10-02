@@ -55,7 +55,7 @@ scan → universal-code (decode, plan) → KaleidoPay account → execute
 
 ## Interfaces between tracks
 
-- **NWC → offer:** `kaleidopay_make_offer` takes `{ description, amount?, rails: RailEntry[] }` and returns `{ offer, offer_id, amount }`. The node side calls our ldk-server fork's `Bolt12Receive` with `ssps_rails = encodeRails(rails)`; stock ldk-server has no such field, so a node without the fork must fail the request, never drop the rails. The fork accepts object entries and amountless offers.
+- **NWC → offer:** `kaleidopay_make_offer` takes `{ description, amount?, rails: RailEntry[] }` and returns `{ offer, offer_id, amount }`. The node side calls our ldk-server fork's `Bolt12Receive` with `ssps_rails = encodeRails(rails)`; stock ldk-server has no such field, so a node without the fork must fail the request, never drop the rails. The fork accepts object entries and amountless offers (ldk-server `d7a20bb`, ldk-node `cf33fbc` on `feat/offer-ssps-rails`); stock ldk-server, which the `ldk-test-env` bridge builds today, does not.
 - **Receive → Pay:** the code is BIP321 (`universal-code` `encodePaymentCode`), so a plain wallet still pays the address or the offer.
 - **Bark → KaleidoPay:** `connectBarkToKaleidoPay(adapter, network)` registers one account with both routes; screens only call `quotePaymentOffers` / `executePaymentOffer`.
 - **wallet-engine patch:** any change to `BarkReactNativeAdapter.sendPayment` must keep `lno1…` going to `payLightningOffer` until the patch is replaced by a release (`barkOffer.test.ts` in Rate guards it).

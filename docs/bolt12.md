@@ -23,8 +23,8 @@ We added that to our forks, branch `feat/offer-ssps-rails` in each:
 | Repo | Commit | Change |
 |---|---|---|
 | [kaleidoswap/rust-lightning](https://github.com/kaleidoswap/rust-lightning/tree/feat/offer-ssps-rails) | `55583cc` | `OfferBuilder::ssps_rails`, `Offer::ssps_rails`; the record is covered by the offer metadata. Test: an issued offer survives parsing and its invoice requests verify; rails appended afterwards are rejected |
-| [kaleidoswap/ldk-node](https://github.com/kaleidoswap/ldk-node/tree/feat/offer-ssps-rails) | `41f1172` | `Bolt12Payment::receive_with_ssps_rails` |
-| [kaleidoswap/ldk-server](https://github.com/kaleidoswap/ldk-server/tree/feat/offer-ssps-rails) | `44f3b4d` | `ssps_rails` on `Bolt12Receive`, CLI `--ssps-rails`. End-to-end test with real bitcoind and ldk-server processes: a payer unaware of the record pays the offer and both sides see it settle |
+| [kaleidoswap/ldk-node](https://github.com/kaleidoswap/ldk-node/tree/feat/offer-ssps-rails) | `41f1172`, `cf33fbc` | `Bolt12Payment::receive_with_ssps_rails`, and `receive_variable_amount_with_ssps_rails` for amountless offers |
+| [kaleidoswap/ldk-server](https://github.com/kaleidoswap/ldk-server/tree/feat/offer-ssps-rails) | `44f3b4d`, `d7a20bb` | `ssps_rails` on `Bolt12Receive` (1–32 string or object entries, with or without an amount), CLI `--ssps-rails`. End-to-end test with real bitcoind and ldk-server processes: a payer unaware of the record pays the offer and both sides see it settle |
 
 ## Live offers
 
