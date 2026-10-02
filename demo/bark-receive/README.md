@@ -88,3 +88,30 @@ payment hash before calling the SDK. If the response is lost, use send-status;
 never delete the marker to retry. Keep receiver reconciliation running while
 the Lightning hold invoice is pending. Final balances above were read after
 reopening both wallets. Native Bark and Rate integration remain unverified.
+
+## Reusable BOLT12 QR preflight
+
+Bark WASM 0.24.0 exposes `payLightningOffer`; the installed native 0.25.0 bindings
+also expose it, and wallet-engine beta.75 dispatches offers to that method.
+Offer resolution belongs to Bark, not an invented conversion to BOLT11.
+
+```sh
+npm run probe -- --offer-capabilities
+npm run probe -- --offer-review /absolute/path/offer.txt --amount 100
+node --test offer.test.mjs
+```
+
+Both probe commands are read-only: they neither fetch an invoice nor pay.
+The review accepts only simple Bitcoin-mainnet offers with an exact satoshi
+amount (or no fixed amount), and rejects currency/quantity variants. It is a
+conservative structural preflight, not full BOLT12 protocol validation.
+`paymentEvidence` verifies a paid result's preimage without retaining it;
+`verifyRepeatedOffer` rejects duplicate payment hashes or differing offers.
+No live BOLT12 payment has been verified. The previous local recipient at
+localhost:13646 was unreachable and was a Mutinynet node, not mainnet.
+
+For the merchant demo, prefer an externally running BOLT12-capable node over
+embedding a new LDK node in the mobile app. A mainnet receiver still needs a
+reachable invoice-request path and inbound channel liquidity. Existing NWC
+core make_invoice support does not establish reusable BOLT12 offer support;
+the local ldk-test-env NWC bridge currently has no BOLT12-specific method.

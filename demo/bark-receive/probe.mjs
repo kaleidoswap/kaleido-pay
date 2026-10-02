@@ -3,6 +3,7 @@ import {readFile,mkdir,writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {invoiceFacts} from '../arkade-receive/invoice.mts';
 import {chromium} from 'playwright-core';
+import {reviewOffer} from './offer.mjs';
 process.umask(0o077);
 const state=resolve(import.meta.dirname,'../.attempts/bark-mainnet');
 await mkdir(state,{recursive:true,mode:0o700});
@@ -36,6 +37,18 @@ try{
   return {network:properties.network,balance};
  },mnemonic);
  console.log(JSON.stringify(result,null,2));
+ if(process.argv.includes('--offer-capabilities')) {
+  console.log(JSON.stringify(await page.evaluate(()=>({payLightningOffer:typeof globalThis.wallet.payLightningOffer==='function',estimateLightningSendFee:typeof globalThis.wallet.estimateLightningSendFee==='function'}))));
+ }
+ if(process.argv.includes('--offer-review')) {
+  const file=process.argv[process.argv.indexOf('--offer-review')+1];
+  const amount=Number(process.argv[process.argv.indexOf('--amount')+1]);
+  if(!file || !process.argv.includes('--amount'))throw Error('Use --offer-review <offer text file> --amount <sats>');
+  const review=reviewOffer(await readFile(resolve(file),'utf8'),amount);
+  const estimate=await page.evaluate(sats=>globalThis.wallet.estimateLightningSendFee(sats),amount);
+  console.log(JSON.stringify({offerFingerprint:review.offerFingerprint,amountSats:amount,estimatedFeeSats:estimate.feeSats,estimatedTotalSats:estimate.grossAmountSats,protocolValidated:false,paymentAuthorized:false}));
+ }
+
  if(process.argv.includes('--send-review') || process.argv.includes('--send')) {
   const records=JSON.parse(await readFile(resolve(import.meta.dirname,'../.attempts/arkade-mainnet-probe/records.json'),'utf8'));
   const pending=Object.values(records).filter(r=>r.route==='lightning:BTC->arkade:BTC'&&r.phase==='prepared');
