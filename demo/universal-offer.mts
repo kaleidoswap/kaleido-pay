@@ -48,4 +48,8 @@ const { stdout } = await run('signet/ldk-node/run.sh', [
 const offer = JSON.parse(stdout).offer as string;
 console.log(`Universal offer from our ldk-server on ${network}, ${o.amount} sat, rails ${JSON.stringify(rails)}:`);
 show(offer);
-console.log(`\nBIP321 form: ${encodePaymentCode({ offer, amountSat: Number(o.amount) }, network as any)}`);
+// The btc rail is paid to the BIP321 address (docs/ARCHITECTURE.md).
+const address = rails.some(r => r.startsWith('btc'))
+  ? JSON.parse((await run('signet/ldk-node/run.sh', ['cli', 'onchain-receive'], { env: { ...process.env, NET: network } })).stdout).address as string
+  : undefined;
+console.log(`\nBIP321 form: ${encodePaymentCode({ address, offer, amountSat: Number(o.amount) }, network as any)}`);
